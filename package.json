@@ -2,11 +2,20 @@
   "author": "Paul Price <pprice@balihoo.com> (http://balihoo.com)",
   "name": "balihoo-creative",
   "description": "Desktop tools for Balihoo creative designers",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "repository": {
     "type": "git",
     "url": "https://github.com/balihoo/creative-framework"
   },
+  "bugs": {
+    "url": "https://github.com/balihoo/balihoo-creative/issues"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/balihoo/balihoo-creative/blob/master/LICENSE"
+    }
+  ],
   "main": "lib/creative.js",
   "scripts": {
     "test": "make test"
@@ -14,11 +23,17 @@
   "engines": {
     "node": ">= 0.10.26"
   },
-  "dependencies": {},
+  "dependencies": {
+    "minimist": "1.1.0"
+  },
   "devDependencies": {
     "nodeunit": "*",
     "docco": "*",
     "coffee-script": ">= 1.7.1"
+  },
+  "preferGlobal": "true",
+  "bin": {
+    "balihoo-creative": "lib/creative.js"
   },
   "keywords": ["balihoo"]
 }

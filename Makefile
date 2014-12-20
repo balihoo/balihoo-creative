@@ -15,7 +15,9 @@ clean: clean-docs
 	rm -rf lib/ test/*.js
 
 build:
-	coffee -o lib/ -c src/ && coffee -c test/refix.coffee
+	coffee -o lib/ -c src/ && coffee -c test/creative.coffee
+	cat src/header.txt lib/creative.js > lib/creative_tmp.js
+	mv lib/creative_tmp.js lib/creative.js
 
 test:
 	nodeunit test/balihoo-creative.js
