@@ -1,6 +1,6 @@
 PATH := ./node_modules/.bin:${PATH}
 
-.PHONY : init clean-docs clean build test dist publish
+.PHONY : init clean build dist publish
 
 init:
 	npm install
@@ -8,21 +8,13 @@ init:
 docs:
 	docco src/*.coffee
 
-clean-docs:
-	rm -rf docs/
-
-clean: clean-docs
-	rm -rf lib/ test/*.js
+clean:
+	rm -rf lib/
 
 build:
-	coffee -o lib/ -c src/ && coffee -c test/creative.coffee
-	cat src/header.txt lib/creative.js > lib/creative_tmp.js
-	mv lib/creative_tmp.js lib/creative.js
+	coffee -o lib/ -c src/
 
-test:
-	nodeunit test/balihoo-creative.js
-
-dist: clean init docs build test
+dist: clean init build
 
 publish: dist
 	npm publish
