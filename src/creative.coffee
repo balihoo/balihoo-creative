@@ -1,8 +1,11 @@
 
-fs       = require 'fs'
-path     = require 'path'
-colors   = require 'colors'
-chokidar = require 'chokidar'
+fs        = require 'fs'
+qs        = require 'querystring'
+path      = require 'path'
+colors    = require 'colors'
+chokidar  = require 'chokidar'
+mustache  = require 'mustache'
+parseURL  = (require 'url').parse
 
 console.log "Balihoo Web Designer Toolkit".blue
 
@@ -13,7 +16,8 @@ configPath = '.balihoo-creative.json'
 
 # Return an object representation the files in the assets/ dir
 scanAssetsDir = ->
-  walk = (cdir, parent = null) ->
+  partials = {}
+  walk = (cdir) ->
     dir = {}
     for fileName in fs.readdirSync cdir
       assetPath = "#{cdir}/#{fileName}"
@@ -25,10 +29,13 @@ scanAssetsDir = ->
         # Asset's key is file name without extension
         key = fileName.replace /\.[^/.]+$/, ''
         ext = (fileName.substr key.length + 1).toLowerCase()
-        value = if ext is 'mustache' then fs.readFileSync(assetPath, encoding:'utf8') else assetPath
-        dir[key] = value unless key.length is 0
+        if ext is 'mustache'
+          partials[key] = fs.readFileSync(assetPath, encoding:'utf8')
+        else
+          dir[key] = assetPath
     dir
-  walk process.cwd() + "/assets";
+  assets = walk process.cwd() + "/assets"
+  [assets, partials]
 
 # If this is a brand new project then go ahead and set it up
 if not fs.existsSync configPath
@@ -38,7 +45,7 @@ if not fs.existsSync configPath
   config =
     name: projectName
     description: ''
-    index: 'index'
+    main: 'index'
 else
   console.log "Found existing project config file #{configPath.gray}"
   config = JSON.parse fs.readFileSync configPath, encoding:'utf8'
@@ -58,16 +65,52 @@ if not fs.existsSync './assets'
         rcopy srcPath, destPath, indent + '  ' 
       else
         console.log "#{indent}  #{fileName}".white
-        fs.createReadStream(srcPath).pipe(fs.createWriteStream(destPath));
+        fs.writeFileSync(destPath, fs.readFileSync(srcPath))
 
   # Recursively copy all the template files into the current project 
   rcopy __dirname + '/../template', process.cwd(), '  '
 
 
 # Start with an up to date view of the assets directory
-config.assets = scanAssetsDir()
+[config.assets, partials] = scanAssetsDir()
 fs.writeFileSync configPath, JSON.stringify(config, null, "  ")
-console.log config.assets
+
+main = if config.main? then config.main else 'index'
+
+parseRequest = (url) ->
+  parts = parseURL url
+
+  # Start with the parsed querystring
+  result = qs.parse parts.query
+
+  # Get all of the parts of the path with empty parts removed
+  path = (part for part in parts.pathname.split /\// when part.length > 0)
+
+  # The page is the directory of the path or 'index'
+  page = if path.length > 0 then path.shift() else 'index'
+  result.page = {}
+  result.page[page] = true
+
+  # The remaining directory parts are key/value pairs
+  # If an odd number remain, the last key's has value is undefined
+  for p in [0...path.length] by 2
+    result[path[p]] = {}
+    if path.length > p + 1
+      result[path[p]][path[p+1]] = true
+    else
+      result[path[p]] = undefined
+  result
+
+base = "http://localhost:8089/"
+context =
+  request: parseRequest base
+  assets: config.assets
+  partials: partials
+
+html = mustache.render context.partials[main], context
+console.log html
+
+###
 
 # Now, watch the asset directory and see if any files change, add or delete
 # We don't really care what happens to the directory, we'll just recompute all
@@ -75,4 +118,4 @@ chokidar.watch('./assets', ignoreInitial:yes).on 'all', (event, path)->
   config.assets = scanAssetsDir()
   console.log config.assets
  
-
+###
