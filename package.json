@@ -2,7 +2,7 @@
   "author": "Paul Price <pprice@balihoo.com> (http://balihoo.com)",
   "name": "balihoo-creative",
   "description": "Desktop tools for Balihoo creative designers",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "repository": {
     "type": "git",
     "url": "https://github.com/balihoo/creative-framework"
@@ -29,7 +29,8 @@
     "chokidar": "0.12.5",
     "mustache": "1.0.0",
     "mime": "1.2.11",
-    "opn": "1.0.0"
+    "opn": "1.0.0",
+    "sse-stream": "0.0.4"
   },
   "devDependencies": {
     "nodeunit": "*",

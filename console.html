@@ -1,0 +1,65 @@
+<html>
+  <head>
+    <title>Balihoo | Web Designer Console</title>
+    <style>
+      body {
+        margin: 0px;
+        background-color: #efefef;
+      }
+      #toolbar {
+        margin: 0px;
+        padding: 10px;
+        border: 0px;
+      }
+      iframe {
+        border: 0px;
+        border-top-color: black;
+        border-top-style: inset;
+        border-top-width: 3px;
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="toolbar">
+      <input id="nav" type="text" size="50"/>
+    </div>
+
+   <script>
+
+    nav.onkeydown = function(evt) {
+      var nav = document.getElementById('nav');
+      if(evt.keyCode == 13)
+        navChange(nav.value);
+    }
+
+    function navChange(location) {
+      var iframe = document.getElementById('contentFrame');
+      var nav = document.getElementById('nav');
+
+      if(location === null)
+        nav.value = iframe.contentWindow.location;
+      else
+        iframe.contentWindow.location = location;
+    }
+
+    window.onload = function() {
+      var iframe = document.getElementById('contentFrame');
+      var es = new EventSource('/updates')
+      es.onmessage = function(event) {
+        if(event.data == 'refresh')
+          iframe.contentWindow.location.reload();
+        else
+          iframe.src = event.data;
+      }
+    }
+    </script>
+
+    <iframe id="contentFrame" onload="navChange(null);">
+      Your browser does not support iframes. Bummer.
+    </iframe>
+
+   </body>
+</html>
+

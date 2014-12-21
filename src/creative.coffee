@@ -2,6 +2,7 @@
 fs        = require 'fs'
 qs        = require 'querystring'
 opn       = require 'opn'
+sse       = (require 'sse-stream')('/updates')
 path      = require 'path'
 http      = require 'http'
 mime      = require 'mime'
@@ -19,6 +20,9 @@ configPath = './assets/.balihoo-creative.json'
 
 ignoreFile = (path) ->
   /^\./.test(path) || /\/\./.test(path) || /~$/.test(path)
+
+# Load in the static HTML that is the console
+consoleContent = fs.readFileSync __dirname + '/../console.html'
 
 # Return an object representation the files in the assets/ dir
 scanAssetsDir = ->
@@ -123,7 +127,12 @@ server = http.createServer (req, res) ->
   context =
     request: parseRequest req.url
     assets: config.assets
-  if context.request.ifpage._?
+  # Load the console that uses SSE to reload the iframed pages
+  if context.request.ifpage.$console?
+    res.writeHead 200, 'Content-Type': 'text/html'
+    res.end consoleContent
+  # Serve up the static content
+  else if context.request.ifpage._?
     assetFile = './assets' + context.request.path.substring 2
     if validFiles.hasOwnProperty assetFile
       res.writeHead 200, 'Content-Type': mime.lookup assetFile
@@ -134,7 +143,8 @@ server = http.createServer (req, res) ->
         res.end(mustache.render partials['404'], context, partials)
       else
         res.end 'Page Not Found'
-   else
+  # Server up the templated content
+  else
     if context.request.page not in config.pages
       res.writeHead 404, 'Content-Type': 'text/html'
       if partials.hasOwnProperty '404'
@@ -145,11 +155,20 @@ server = http.createServer (req, res) ->
       res.writeHead 200, 'Content-Type': 'text/html'
       res.end(mustache.render partials[config.template], context, partials)
 
+clients = []
+sse.install server
+sse.on 'connection', (client) ->
+  clients.push client
+  client.write '/'
+
+  client.on 'end', ->
+    clients.splice clients.indexOf(client), 1
+
 port = 8088
 server.listen port
 
-console.log "Opening page in browser".inverse
-opn "http://localhost:#{port}"
+console.log "Opening console in web browser".inverse
+opn "http://localhost:#{port}/$console"
 
 # Watch the assets directory and see if any files change, add or delete
 # We don't really care what happens to the directory, we'll just recompute all
@@ -166,6 +185,7 @@ chokidar.watch( './assets/', ignoreInitial: yes).on 'all', (event, path)->
   [config.assets, partials, validFiles] = scanAssetsDir()
   if not config.template? then config.template = 'main'
   if not config.pages then config.pages = [config.template]
+  client.write 'refresh' for client in clients
   if saveConfig
     console.log "Updating config file".green
     fs.writeFileSync configPath, JSON.stringify(config, null, "  ")
