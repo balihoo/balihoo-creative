@@ -54,6 +54,7 @@ scanAssetsDir = ->
 
 # If there is no assets directory, then we should build one
 if not fs.existsSync './assets/'
+  console.log 'Creating an assets/ directory'.yellow
   needAssets = true
   fs.mkdirSync './assets/'
 
@@ -78,17 +79,18 @@ if needAssets
     for fileName in fs.readdirSync srcDir
       srcPath = "#{srcDir}/#{fileName}"
       destPath = "#{destDir}/#{fileName}"
-      if not ignoreFile srcPath
-        stat = fs.statSync srcPath
-        if stat.isDirectory()
-          console.log "#{indent}#{fileName}/".white
-          fs.mkdirSync destPath unless fs.existsSync destPath
-          rcopy srcPath, destPath, indent + '  ' 
-        else if not fileName.match /\.swp$/
-          console.log "#{indent}  #{fileName}".white
-          fs.writeFileSync(destPath, fs.readFileSync(srcPath))
+
+      stat = fs.statSync srcPath
+      if stat.isDirectory()
+        console.log "#{indent}#{fileName}/".white
+        fs.mkdirSync destPath unless fs.existsSync destPath
+        rcopy srcPath, destPath, indent + '  ' 
+      else if not fileName.match /\.swp$/
+        console.log "#{indent}  #{fileName}".white
+        fs.writeFileSync(destPath, fs.readFileSync(srcPath))
 
   # Recursively copy all the template files into the current project 
+  console.log "Creating a project skeleton in #{__dirname}/../template".yellow
   rcopy __dirname + '/../template', process.cwd(), '  '
 
 
