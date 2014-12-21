@@ -1,6 +1,7 @@
 
 fs        = require 'fs'
 qs        = require 'querystring'
+opn       = require 'opn'
 path      = require 'path'
 http      = require 'http'
 mime      = require 'mime'
@@ -16,6 +17,9 @@ console.log "Balihoo Web Designer Toolkit".blue
 # Project level configuration file
 configPath = './assets/.balihoo-creative.json'
 
+ignoreFile = (path) ->
+  /^\./.test(path) || /\/\./.test(path) || /~$/.test(path)
+
 # Return an object representation the files in the assets/ dir
 scanAssetsDir = ->
   partials = {}
@@ -25,20 +29,21 @@ scanAssetsDir = ->
     dir = {}
     for fileName in fs.readdirSync cdir
       assetPath = "#{cdir}/#{fileName}"
-      stat = fs.statSync assetPath
-      if stat.isDirectory()
-        # Asset directory key is directory name
-        dir[fileName] = walk assetPath
-      else
-        # Asset's key is file name without extension
-        key = fileName.replace /\.[^/.]+$/, ''
-        ext = (fileName.substr key.length + 1).toLowerCase()
-        val = assetPath.substr base.length
-        if ext is 'mustache'
-          partials[key] = fs.readFileSync(assetPath, encoding:'utf8')
+      if not ignoreFile assetPath
+        stat = fs.statSync assetPath
+        if stat.isDirectory()
+          # Asset directory key is directory name
+          dir[fileName] = walk assetPath
         else
-          validFiles["./assets#{val}"] = fs.readFileSync assetPath
-          dir[key] = "/_#{val}"
+          # Asset's key is file name without extension
+          key = fileName.replace /\.[^/.]+$/, ''
+          ext = (fileName.substr key.length + 1).toLowerCase()
+          val = assetPath.substr base.length
+          if ext is 'mustache'
+            partials[key] = fs.readFileSync(assetPath, encoding:'utf8')
+          else
+            validFiles["./assets#{val}"] = fs.readFileSync assetPath
+            dir[key] = "/_#{val}"
     dir
   assets = walk base
   [assets, partials, validFiles]
@@ -69,15 +74,15 @@ if needAssets
     for fileName in fs.readdirSync srcDir
       srcPath = "#{srcDir}/#{fileName}"
       destPath = "#{destDir}/#{fileName}"
-
-      stat = fs.statSync srcPath
-      if stat.isDirectory()
-        console.log "#{indent}#{fileName}/".white
-        fs.mkdirSync destPath unless fs.existsSync destPath
-        rcopy srcPath, destPath, indent + '  ' 
-      else if not fileName.match /\.swp$/
-        console.log "#{indent}  #{fileName}".white
-        fs.writeFileSync(destPath, fs.readFileSync(srcPath))
+      if not ignoreFile srcPath
+        stat = fs.statSync srcPath
+        if stat.isDirectory()
+          console.log "#{indent}#{fileName}/".white
+          fs.mkdirSync destPath unless fs.existsSync destPath
+          rcopy srcPath, destPath, indent + '  ' 
+        else if not fileName.match /\.swp$/
+          console.log "#{indent}  #{fileName}".white
+          fs.writeFileSync(destPath, fs.readFileSync(srcPath))
 
   # Recursively copy all the template files into the current project 
   rcopy __dirname + '/../template', process.cwd(), '  '
@@ -140,14 +145,28 @@ server = http.createServer (req, res) ->
       res.writeHead 200, 'Content-Type': 'text/html'
       res.end(mustache.render partials[config.template], context, partials)
 
-server.listen 8088
+port = 8088
+server.listen port
 
-###
+console.log "Opening page in browser".inverse
+opn "http://localhost:#{port}"
 
-# Now, watch the asset directory and see if any files change, add or delete
+# Watch the assets directory and see if any files change, add or delete
 # We don't really care what happens to the directory, we'll just recompute all
-chokidar.watch('./assets', ignoreInitial:yes).on 'all', (event, path)->
-  config.assets = scanAssetsDir()
-  console.log config.assets
- 
-###
+chokidar.watch( './assets/', ignoreInitial: yes).on 'all', (event, path)->
+  if /\.balihoo-creative\.json$/.test path
+    console.log "#{path} has been updated, reloading".red.inverse
+    config = JSON.parse fs.readFileSync configPath, encoding:'utf8'
+    saveConfig = false
+  else if ignoreFile path || not /^assets\//.test path
+    return
+  else
+    console.log "#{event} detected in #{path}".yellow
+
+  [config.assets, partials, validFiles] = scanAssetsDir()
+  if not config.template? then config.template = 'main'
+  if not config.pages then config.pages = [config.template]
+  if saveConfig
+    console.log "Updating config file".green
+    fs.writeFileSync configPath, JSON.stringify(config, null, "  ")
+

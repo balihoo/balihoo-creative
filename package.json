@@ -28,7 +28,8 @@
     "colors": "1.0.3",
     "chokidar": "0.12.5",
     "mustache": "1.0.0",
-    "mime": "1.2.11"
+    "mime": "1.2.11",
+    "opn": "1.0.0"
   },
   "devDependencies": {
     "nodeunit": "*",
