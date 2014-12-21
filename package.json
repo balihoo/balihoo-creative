@@ -27,7 +27,8 @@
     "minimist": "1.1.0",
     "colors": "1.0.3",
     "chokidar": "0.12.5",
-    "mustache": "1.0.0"
+    "mustache": "1.0.0",
+    "mime": "1.2.11"
   },
   "devDependencies": {
     "nodeunit": "*",

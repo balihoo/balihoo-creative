@@ -1,5 +1,5 @@
 
 window.onload = function() {
-  alert("this works!");
+  console.log("Ran some javascript");
 }
 
