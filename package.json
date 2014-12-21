@@ -25,7 +25,8 @@
   },
   "dependencies": {
     "minimist": "1.1.0",
-    "colors": "1.0.3"
+    "colors": "1.0.3",
+    "chokidar": "0.12.5"
   },
   "devDependencies": {
     "nodeunit": "*",
