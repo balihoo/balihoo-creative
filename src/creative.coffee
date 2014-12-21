@@ -7,7 +7,8 @@ path      = require 'path'
 http      = require 'http'
 mime      = require 'mime'
 colors    = require 'colors'
-chokidar  = require 'chokidar'
+scanner   = require './assetscanner'
+watcher   = require './assetwatcher'
 mustache  = require 'mustache'
 parseURL  = (require 'url').parse
 
@@ -18,39 +19,8 @@ console.log "Balihoo Web Designer Toolkit".blue
 # Project level configuration file
 configPath = './assets/.balihoo-creative.json'
 
-ignoreFile = (path) ->
-  /^\./.test(path) || /\/\./.test(path) || /~$/.test(path)
-
 # Load in the static HTML that is the console
 consoleContent = fs.readFileSync __dirname + '/../console.html'
-
-# Return an object representation the files in the assets/ dir
-scanAssetsDir = ->
-  partials = {}
-  validFiles = {}
-  base = process.cwd() + "/assets"
-  walk = (cdir) ->
-    dir = {}
-    for fileName in fs.readdirSync cdir
-      assetPath = "#{cdir}/#{fileName}"
-      if not ignoreFile assetPath
-        stat = fs.statSync assetPath
-        if stat.isDirectory()
-          # Asset directory key is directory name
-          dir[fileName] = walk assetPath
-        else
-          # Asset's key is file name without extension
-          key = fileName.replace /\.[^/.]+$/, ''
-          ext = (fileName.substr key.length + 1).toLowerCase()
-          val = assetPath.substr base.length
-          if ext is 'mustache'
-            partials[key] = fs.readFileSync(assetPath, encoding:'utf8')
-          else
-            validFiles["./assets#{val}"] = fs.readFileSync assetPath
-            dir[key] = "/_#{val}"
-    dir
-  assets = walk base
-  [assets, partials, validFiles]
 
 # If there is no assets directory, then we should build one
 if not fs.existsSync './assets/'
@@ -95,7 +65,7 @@ if needAssets
 
 
 # Start with an up to date view of the assets directory
-[config.assets, partials, validFiles] = scanAssetsDir()
+[config.assets, partials, validFiles] = scanner.scan()
 if not config.template? then config.template = 'main'
 if not config.pages then config.pages = [config.template]
 fs.writeFileSync configPath, JSON.stringify(config, null, "  ")
@@ -172,23 +142,22 @@ server.listen port
 console.log "Opening console in web browser".inverse
 opn "http://localhost:#{port}/$console"
 
-# Watch the assets directory and see if any files change, add or delete
-# We don't really care what happens to the directory, we'll just recompute all
-chokidar.watch( './assets/', ignoreInitial: yes).on 'all', (event, path)->
-  if /\.balihoo-creative\.json$/.test path
-    console.log "#{path} has been updated, reloading".red.inverse
-    config = JSON.parse fs.readFileSync configPath, encoding:'utf8'
-    saveConfig = false
-  else if ignoreFile path || not /^assets\//.test path
-    return
-  else
-    console.log "#{event} detected in #{path}".yellow
+parseConfig = ->
+  console.log "Reparsing config"
+  config = JSON.parse fs.readFileSync configPath, encoding:'utf8'
 
-  [config.assets, partials, validFiles] = scanAssetsDir()
+rescan = ->
+  console.log "Rescanning assets"
+  [config.assets, partials, validFiles] = scanner.scan()
   if not config.template? then config.template = 'main'
   if not config.pages then config.pages = [config.template]
   client.write 'refresh' for client in clients
-  if saveConfig
-    console.log "Updating config file".green
-    fs.writeFileSync configPath, JSON.stringify(config, null, "  ")
+
+saveConfig = ->
+  console.log "Saving config file".green
+  fs.writeFileSync configPath, JSON.stringify(config, null, "  ")
+
+watcher.watch()
+  .on 'config', -> parseConfig(); rescan()
+  .on 'update', -> rescan(); saveConfig()
 
