@@ -21,8 +21,8 @@ exports.create = (config, partials, validFiles) =>
 
   notfound = (res, context) ->
     res.writeHead 404, 'Content-Type': 'text/html'
-    if partials.hasOwnProperty '404'
-      res.end(mustache.render partials['404'], context, partials)
+    if @partials.hasOwnProperty '404'
+      res.end(mustache.render @partials['404'], context, @partials)
     else
       res.end 'Page Not Found'
 
@@ -36,7 +36,7 @@ exports.create = (config, partials, validFiles) =>
     # 1) If this is one of our configured pages, serve it up
     if context.request.page in @config.pages
       res.writeHead 200, 'Content-Type': 'text/html'
-      res.end(mustache.render partials[@config.template], context, partials)
+      res.end(mustache.render @partials[@config.template], context, @partials)
 
     # 2) If the $console is requested then serve it up
     else if context.request.ifpage.$console?
@@ -46,9 +46,9 @@ exports.create = (config, partials, validFiles) =>
     # 3) _ is a special page that indicates static content
     else if context.request.ifpage._?
       assetFile = './assets' + context.request.path.substring 2
-      if validFiles.hasOwnProperty assetFile
+      if @validFiles.hasOwnProperty assetFile
         res.writeHead 200, 'Content-Type': mime.lookup assetFile
-        res.end validFiles[assetFile]
+        res.end @validFiles[assetFile]
 
     # 4) Can't find the requested content
     else
