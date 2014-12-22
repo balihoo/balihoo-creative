@@ -7,9 +7,7 @@ mime      = require 'mime'
 path      = require 'path'
 colors    = require 'colors'
 parser    = require './urlparser'
-assets    = require './assetmanager'
-scanner   = require './assetscanner'
-watcher   = require './assetwatcher'
+assets    = (require './assetmanager')('assets')
 mustache  = require 'mustache'
 
 console.log "Balihoo Web Designer Toolkit".blue
@@ -57,7 +55,7 @@ parseConfig = ->
 
 rescan = ->
   console.log "Scanning assets"
-  [config.assets, partials, validFiles] = scanner.scan()
+  [config.assets, partials, validFiles] = assets.scan()
   if not config.template? then config.template = 'main'
   if not config.pages then config.pages = [config.template]
 
@@ -119,7 +117,7 @@ refreshClients = ->
 console.log "Opening console in web browser".inverse
 opn "http://localhost:#{port}/$console"
 
-watcher.watch()
+assets.watch()
   .on 'config', -> f() for f in [parseConfig, rescan, refreshClients]
   .on 'update', -> f() for f in [rescan, saveConfig, refreshClients]
 
