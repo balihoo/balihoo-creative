@@ -83,6 +83,5 @@ module.exports = (assetDirectory) ->
               dir[key] = "/_#{rel}"
       dir
     assets = walk base
-    console.dir assets
     [assets, partials, validFiles]
 

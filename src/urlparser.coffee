@@ -4,7 +4,7 @@ colors    = require 'colors'
 parseURL  = (require 'url').parse
 
 fixKey = (str) ->
-  str.replace /\s+/g, '_' 
+  str.replace(/\s+/g, '_').toLowerCase()
 
 exports.parse = (url, defaultIndex = 'index') ->
   # Break the url into various pieces
@@ -22,7 +22,7 @@ exports.parse = (url, defaultIndex = 'index') ->
   path = (part for part in parts.pathname.split /\// when part.length > 0)
 
   # The page is the directory of the path or defaultIndex
-  result.page = if path.length > 0 then path.shift() else defaultIndex
+  result.page = if path.length > 0 then path.shift().toLowerCase() else defaultIndex
   result.ifpage = {}
   result.ifpage[result.page] = true
 
