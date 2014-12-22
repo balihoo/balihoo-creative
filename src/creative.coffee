@@ -14,7 +14,10 @@ parseURL  = (require 'url').parse
 
 console.log "Balihoo Web Designer Toolkit".blue
 
-# argv = require('minimist') process.argv.slice(2)
+# Set up some global variables
+config = {}
+partials = {}
+validFiles = {}
 
 # Project level configuration file
 configPath = './assets/.balihoo-creative.json'
@@ -63,12 +66,23 @@ if needAssets
   console.log "Creating a project skeleton in #{__dirname}/../template".yellow
   rcopy __dirname + '/../template', process.cwd(), '  '
 
+parseConfig = ->
+  console.log "Reparsing config"
+  config = JSON.parse fs.readFileSync configPath, encoding:'utf8'
+
+rescan = ->
+  console.log "Scanning assets"
+  [config.assets, partials, validFiles] = scanner.scan()
+  if not config.template? then config.template = 'main'
+  if not config.pages then config.pages = [config.template]
+
+saveConfig = ->
+  console.log "Saving config file".green
+  fs.writeFileSync configPath, JSON.stringify(config, null, "  ")
 
 # Start with an up to date view of the assets directory
-[config.assets, partials, validFiles] = scanner.scan()
-if not config.template? then config.template = 'main'
-if not config.pages then config.pages = [config.template]
-fs.writeFileSync configPath, JSON.stringify(config, null, "  ")
+rescan()
+saveConfig()
 
 parseRequest = (url) ->
   parts = parseURL url
@@ -139,25 +153,13 @@ sse.on 'connection', (client) ->
 port = 8088
 server.listen port
 
+refreshClients = ->
+  client.write 'refresh' for client in clients
+
 console.log "Opening console in web browser".inverse
 opn "http://localhost:#{port}/$console"
 
-parseConfig = ->
-  console.log "Reparsing config"
-  config = JSON.parse fs.readFileSync configPath, encoding:'utf8'
-
-rescan = ->
-  console.log "Rescanning assets"
-  [config.assets, partials, validFiles] = scanner.scan()
-  if not config.template? then config.template = 'main'
-  if not config.pages then config.pages = [config.template]
-  client.write 'refresh' for client in clients
-
-saveConfig = ->
-  console.log "Saving config file".green
-  fs.writeFileSync configPath, JSON.stringify(config, null, "  ")
-
 watcher.watch()
-  .on 'config', -> parseConfig(); rescan()
-  .on 'update', -> rescan(); saveConfig()
+  .on 'config', -> parseConfig(); rescan(); refreshClients()
+  .on 'update', -> rescan(); saveConfig(); refreshClients()
 
