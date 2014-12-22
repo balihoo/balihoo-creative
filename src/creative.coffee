@@ -1,16 +1,14 @@
 
 fs        = require 'fs'
-qs        = require 'querystring'
 opn       = require 'opn'
 sse       = (require 'sse-stream')('/updates')
-path      = require 'path'
 http      = require 'http'
 mime      = require 'mime'
 colors    = require 'colors'
+parser    = require './urlparser'
 scanner   = require './assetscanner'
 watcher   = require './assetwatcher'
 mustache  = require 'mustache'
-parseURL  = (require 'url').parse
 
 console.log "Balihoo Web Designer Toolkit".blue
 
@@ -84,34 +82,9 @@ saveConfig = ->
 rescan()
 saveConfig()
 
-parseRequest = (url) ->
-  parts = parseURL url
-
-  # Start with the parsed querystring
-  result = qs.parse parts.query
-  result.path = parts.pathname
-
-  # Get all of the parts of the path with empty parts removed
-  path = (part.toLowerCase() for part in parts.pathname.split /\// when part.length > 0)
-
-  # The page is the directory of the path or 'index'
-  result.page = if path.length > 0 then path.shift() else 'index'
-  result.ifpage = {}
-  result.ifpage[result.page] = true
-
-  # The remaining directory parts are key/value pairs
-  # If an odd number remain, the last key's has value is undefined
-  for p in [0...path.length] by 2
-    result[path[p]] = {}
-    if path.length > p + 1
-      result[path[p]][path[p+1]] = true
-    else
-      result[path[p]] = undefined
-  result
-
 server = http.createServer (req, res) ->
   context =
-    request: parseRequest req.url
+    request: parser.parse req.url
     assets: config.assets
   # Load the console that uses SSE to reload the iframed pages
   if context.request.ifpage.$console?
