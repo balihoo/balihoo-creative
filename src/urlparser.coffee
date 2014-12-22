@@ -39,6 +39,5 @@ exports.parse = (url, defaultIndex = 'index') ->
     else
       result[ifkey] = undefined
       result[key] = undefined
-  console.log "Result is".green, result
   result
 

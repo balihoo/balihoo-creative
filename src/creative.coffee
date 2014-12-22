@@ -4,8 +4,10 @@ opn       = require 'opn'
 sse       = (require 'sse-stream')('/updates')
 http      = require 'http'
 mime      = require 'mime'
+path      = require 'path'
 colors    = require 'colors'
 parser    = require './urlparser'
+assets    = require './assetmanager'
 scanner   = require './assetscanner'
 watcher   = require './assetwatcher'
 mustache  = require 'mustache'
@@ -45,24 +47,9 @@ else
 
 # If the asset directory doesn't already exist, then create one
 if needAssets
-  # Recursively copy files from srcDir to destDir
-  rcopy = (srcDir, destDir, indent) ->
-    for fileName in fs.readdirSync srcDir
-      srcPath = "#{srcDir}/#{fileName}"
-      destPath = "#{destDir}/#{fileName}"
-
-      stat = fs.statSync srcPath
-      if stat.isDirectory()
-        console.log "#{indent}#{fileName}/".white
-        fs.mkdirSync destPath unless fs.existsSync destPath
-        rcopy srcPath, destPath, indent + '  ' 
-      else if not fileName.match /\.swp$/
-        console.log "#{indent}  #{fileName}".white
-        fs.writeFileSync(destPath, fs.readFileSync(srcPath))
-
   # Recursively copy all the template files into the current project 
   console.log "Creating a project skeleton in #{__dirname}/../template".yellow
-  rcopy __dirname + '/../template', process.cwd(), '  '
+  assets.rcopy __dirname + '/../template', process.cwd(), '  '
 
 parseConfig = ->
   console.log "Reparsing config"
@@ -133,6 +120,6 @@ console.log "Opening console in web browser".inverse
 opn "http://localhost:#{port}/$console"
 
 watcher.watch()
-  .on 'config', -> parseConfig(); rescan(); refreshClients()
-  .on 'update', -> rescan(); saveConfig(); refreshClients()
+  .on 'config', -> f() for f in [parseConfig, rescan, refreshClients]
+  .on 'update', -> f() for f in [rescan, saveConfig, refreshClients]
 
