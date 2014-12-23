@@ -23,7 +23,11 @@ exports.create = (config, partials, validFiles, samples) =>
   notfound = (res, context) =>
     res.writeHead 404, 'Content-Type': 'text/html'
     if @partials.hasOwnProperty '404'
-      res.end(mustache.render @partials['404'], context, @partials)
+      try
+        page = mustache.render @partials['404'], context, @partials
+      catch err
+        page = "Error compiling template for 404.mustache:<pre>#{err}</pre>"
+      res.end page
     else
       res.end 'Page Not Found'
 
@@ -39,7 +43,11 @@ exports.create = (config, partials, validFiles, samples) =>
     # 1) If this is one of our configured pages, serve it up
     if context.request.page in @config.pages
       res.writeHead 200, 'Content-Type': 'text/html'
-      res.end(mustache.render @partials[@config.template], context, @partials)
+      try
+        page = mustache.render @partials[@config.template], context, @partials
+      catch err
+        page = "Error compiling #{context.request.page}.mustache:<pre>#{err}</pre>"
+      res.end page
 
     # 2) _ is a special page that indicates static content
     else if context.request.ifpage._?

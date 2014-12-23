@@ -46,7 +46,8 @@ module.exports = (sampleDirectory) ->
       if fileName.match /\.json$/
         dataPath = "#{base}/#{fileName}"
         key = fileName.replace /\.[^/.]+$/, ''
-        data = JSON.parse(fs.readFileSync(dataPath, encoding:'utf8'))
-        samples[key] = data
+        try
+          data = JSON.parse(fs.readFileSync(dataPath, encoding:'utf8'))
+          samples[key] = data
     samples
 
