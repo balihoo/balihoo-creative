@@ -1,12 +1,12 @@
 
 fs        = require 'fs'
 opn       = require 'opn'
-sse       = (require 'sse-stream')('/updates')
 path      = require 'path'
 colors    = require 'colors'
 server    = require './server'
 parser    = require './urlparser'
 assets    = (require './assetmanager')('assets')
+$console  = (require './console')('/$console')
 
 console.log "Balihoo Web Designer Toolkit".blue
 
@@ -66,23 +66,10 @@ rescan()
 saveConfig()
 
 httpserver = server.create config, partials, validFiles
-
-clients = []
-sse.install httpserver
-sse.on 'connection', (client) ->
-  clients.push client
-  client.write '/'
-
-  client.on 'end', ->
-    clients.splice clients.indexOf(client), 1
-
-refreshClients = ->
-  client.write 'refresh' for client in clients
-
-console.log "Opening console in web browser".inverse
-opn "http://localhost:#{config.port}/$console"
+$console.on 'ready', -> opn "http://localhost:#{config.port}/$console"# , 'safari'
+$console.install httpserver
 
 assets.watch()
-  .on 'config', -> f() for f in [parseConfig, rescan, refreshClients]
-  .on 'update', -> f() for f in [rescan, saveConfig, refreshClients]
+  .on 'config', -> f() for f in [parseConfig, rescan, $console.refresh]
+  .on 'update', -> f() for f in [rescan, saveConfig, $console.refresh]
 

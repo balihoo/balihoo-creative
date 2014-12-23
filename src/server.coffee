@@ -1,13 +1,9 @@
 
-fs        = require 'fs'
 http      = require 'http'
 mime      = require 'mime'
 colors    = require 'colors'
 parser    = require './urlparser'
 mustache  = require 'mustache'
-
-# Load in the static HTML used to build the console
-consoleContent = fs.readFileSync __dirname + '/../console.html'
 
 instance = null
 
@@ -19,7 +15,7 @@ exports.update = (config, partials, validFiles) =>
 exports.create = (config, partials, validFiles) =>
   @update config, partials, validFiles
 
-  notfound = (res, context) ->
+  notfound = (res, context) =>
     res.writeHead 404, 'Content-Type': 'text/html'
     if @partials.hasOwnProperty '404'
       res.end(mustache.render @partials['404'], context, @partials)
@@ -38,19 +34,14 @@ exports.create = (config, partials, validFiles) =>
       res.writeHead 200, 'Content-Type': 'text/html'
       res.end(mustache.render @partials[@config.template], context, @partials)
 
-    # 2) If the $console is requested then serve it up
-    else if context.request.ifpage.$console?
-      res.writeHead 200, 'Content-Type': 'text/html'
-      res.end consoleContent
-
-    # 3) _ is a special page that indicates static content
+    # 2) _ is a special page that indicates static content
     else if context.request.ifpage._?
       assetFile = './assets' + context.request.path.substring 2
       if @validFiles.hasOwnProperty assetFile
         res.writeHead 200, 'Content-Type': mime.lookup assetFile
         res.end @validFiles[assetFile]
 
-    # 4) Can't find the requested content
+    # 3) Can't find the requested content
     else
       notfound res, context
 

@@ -8,7 +8,7 @@
       }
       #toolbar {
         margin: 0px;
-        padding: 10px;
+        padding: 15px;
         border: 0px;
       }
       iframe {
@@ -23,7 +23,7 @@
   </head>
   <body>
     <div id="toolbar">
-      <input id="nav" type="text" size="50"/>
+      <input id="nav" type="text" size="60" value="/"/>
     </div>
 
    <script>
@@ -46,12 +46,17 @@
 
     window.onload = function() {
       var iframe = document.getElementById('contentFrame');
-      var es = new EventSource('/updates')
+      var es = new EventSource('/$console')
       es.onmessage = function(event) {
-        if(event.data == 'refresh')
+        e = JSON.parse(event.data);
+        if(e.event === 'refresh') {
           iframe.contentWindow.location.reload();
-        else
-          iframe.src = event.data;
+        } else if(e.event === 'reload') {
+          es.close();
+          window.location.reload();
+        } else if(e.event === 'navigate') {
+          iframe.src = e.data.path;
+        }
       }
     }
     </script>
