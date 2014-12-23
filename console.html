@@ -20,48 +20,83 @@
         height: 100%;
       }
     </style>
+    <script src="http://code.jquery.com/jquery-1.11.2.js"></script>
   </head>
   <body>
     <div id="toolbar">
       <input id="nav" type="text" size="60" value="/"/>
+      <select id="samples">
+        <option value="">Sample Data...</option>
+      </select>
     </div>
 
    <script>
 
     nav.onkeydown = function(evt) {
-      var nav = document.getElementById('nav');
       if(evt.keyCode == 13)
-        navChange(nav.value);
+        navChange($('#nav').val());
     }
 
     function navChange(location) {
-      var iframe = document.getElementById('contentFrame');
-      var nav = document.getElementById('nav');
+      var iframe = $('#contentFrame').get(0);
+      var nav = $('#nav');
 
       if(location === null)
-        nav.value = iframe.contentWindow.location;
+        nav.val(iframe.contentWindow.location);
       else
         iframe.contentWindow.location = location;
     }
 
-    window.onload = function() {
-      var iframe = document.getElementById('contentFrame');
+    function getParameterByName(name) {
+      name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+      var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+        results = regex.exec(location.search);
+      return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+    }
+ 
+    $(function() {
+      var iframe = $('#contentFrame').get(0);
       var es = new EventSource('/$console')
+      var nav = $('#nav');
       es.onmessage = function(event) {
         e = JSON.parse(event.data);
+        console.log("Got event " + e.event);
         if(e.event === 'refresh') {
           iframe.contentWindow.location.reload();
         } else if(e.event === 'reload') {
           es.close();
-          window.location.reload();
+          window.location = window.location.pathname + '?__url='
+            + encodeURIComponent(iframe.contentWindow.location);
         } else if(e.event === 'navigate') {
           iframe.src = e.data.path;
+        } else if(e.event === 'samples') {
+          var sel = $('#samples');
+          var selectedValue = sel.val()
+          sel.empty();
+          sel.append($('<option value="">Sample Data...</option>'));
+          $.each(e.data, function(key, value){
+            sel.append($('<option>').attr('value', key).text(key));
+          });
+
+          sel.val(selectedValue);
+          sel.change(function() {
+            var url = nav.val().replace(/[\?&]?__sample=[^&]*/, '');
+            var key = url.indexOf('?') === -1 ? '?' : '&';
+            iframe.contentWindow.location =
+              url + key + "__sample=" + encodeURIComponent(sel.val());
+          });
+          // Set the initial path
+          url = getParameterByName('__url') || '/';
+          navChange(url);
+          $('#contentFrame').load(function() {
+            navChange(null);
+          });
         }
       }
-    }
+    });
     </script>
 
-    <iframe id="contentFrame" onload="navChange(null);">
+    <iframe id="contentFrame">
       Your browser does not support iframes. Bummer.
     </iframe>
 

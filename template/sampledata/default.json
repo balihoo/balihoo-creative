@@ -1,0 +1,6 @@
+{
+  "name": "ACME Corp",
+  "products": [
+    "Books", "Diapers", "Shoes", "Virtual IT"
+  ]
+}

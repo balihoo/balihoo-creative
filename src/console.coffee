@@ -11,10 +11,11 @@ is_es = (req) ->
   req.method is 'GET' && (!!~accept.indexOf('text/event-stream') || !!~accept.indexOf('text/x-dom-event-stream'))
 
 class Console extends EventEmitter
-  constructor: (@options = path: '/$console') ->
+  constructor: (@options = path: '$console') ->
     @clients = []
+    @samples = {}
     @options = if typeof options is 'string' then path: options else options
-    @sse = (require 'sse-stream')(@options.path)
+    @sse = (require 'sse-stream')("/#{@options.path}")
 
     # Load in the static HTML used to build the console
     # If it is updated then reload it and refresh all clients
@@ -25,6 +26,10 @@ class Console extends EventEmitter
       @consoleContent = fs.readFileSync consoleFile
       @reload()
 
+   updateSamples: (samples) =>
+    @samples = samples
+    @send 'samples', @samples
+
    install: (server) =>
     # Inject the sse request handler
     @sse.install server
@@ -32,7 +37,7 @@ class Console extends EventEmitter
     # When a browser connects, keep track of it
     @sse.on 'connection', (client) =>
       @clients.push client
-      @send 'navigate', path: '/'
+      @send 'samples', @samples, client
 
       # Remove clients that close
       client.on 'end', =>
@@ -42,12 +47,18 @@ class Console extends EventEmitter
     listeners = server.listeners 'request'
     server.removeAllListeners 'request'
     server.on 'request', (req, res) =>
-      console.log "SERVER REQUEST".green, req.url
       request = parser.parse req.url
+
       # If the $console is requested then serve it up
-      if request.path is @options.path && not is_es req
-        res.writeHead 200, 'Content-Type': 'text/html'
-        res.end @consoleContent
+      if request.page is @options.path && not is_es req
+        if request?.ifdata
+          res.writeHead 200, 'Content-Type': 'application/json'
+          res.end JSON.stringify switch request.data
+            when 'samples' then @samples
+            else error: "Unknown console data request #{request.data}"
+        else
+          res.writeHead 200, 'Content-Type': 'text/html'
+          res.end @consoleContent
       else # fall back to server's default events
         l.call server, req, res for l in listeners
 
@@ -59,8 +70,6 @@ class Console extends EventEmitter
       event: event,
       data: data
 
-    console.log "SSE MESSAGE".blue
-    console.dir msg
     if client
       client.write msg
     else

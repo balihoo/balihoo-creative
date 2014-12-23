@@ -7,13 +7,18 @@ mustache  = require 'mustache'
 
 instance = null
 
-exports.update = (config, partials, validFiles) =>
+merge = (src, dest) ->
+  for key, val of src
+    dest[key] = val
+
+exports.update = (config, partials, validFiles, samples) =>
   @config = config
   @partials = partials
   @validFiles = validFiles
+  @samples = samples
 
-exports.create = (config, partials, validFiles) =>
-  @update config, partials, validFiles
+exports.create = (config, partials, validFiles, samples) =>
+  @update config, partials, validFiles, samples
 
   notfound = (res, context) =>
     res.writeHead 404, 'Content-Type': 'text/html'
@@ -26,6 +31,8 @@ exports.create = (config, partials, validFiles) =>
     context =
       request: parser.parse req.url
       assets: @config.assets
+    if context.request.q?.__sample
+      merge @samples[context.request.q.__sample], context
 
     ### Web Server Responses ###
 
