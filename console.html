@@ -25,9 +25,7 @@
   <body>
     <div id="toolbar">
       <input id="nav" type="text" size="60" value="/"/>
-      <select id="samples">
-        <option value="">Sample Data...</option>
-      </select>
+      <select id="samples" value="default"></select>
     </div>
 
    <script>
@@ -71,9 +69,8 @@
           iframe.src = e.data.path;
         } else if(e.event === 'samples') {
           var sel = $('#samples');
-          var selectedValue = sel.val()
+          var selectedValue = sel.val() !== null && sel.val() !== '' ? sel.val() : 'default';
           sel.empty();
-          sel.append($('<option value="">Sample Data...</option>'));
           $.each(e.data, function(key, value){
             sel.append($('<option>').attr('value', key).text(key));
           });
@@ -88,11 +85,13 @@
           // Set the initial path
           url = getParameterByName('__url') || '/';
           navChange(url);
-          $('#contentFrame').load(function() {
-            navChange(null);
-          });
+
         }
       }
+
+      $('#contentFrame').load(function() {
+        navChange(null);
+      });
     });
     </script>
 

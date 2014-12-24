@@ -1,9 +1,11 @@
 
+fs        = require 'fs'
 http      = require 'http'
 mime      = require 'mime'
 colors    = require 'colors'
 parser    = require './urlparser'
 mustache  = require 'mustache'
+tests     = new (require './testmanager')('test')
 
 instance = null
 
@@ -35,13 +37,19 @@ exports.create = (config, partials, validFiles, samples) =>
     context =
       request: parser.parse req.url
       assets: @config.assets
-    if context.request.q?.__sample
-      merge @samples[context.request.q.__sample], context
 
     ### Web Server Responses ###
 
     # 1) If this is one of our configured pages, serve it up
     if context.request.page in @config.pages
+      # Inject the sample data - always try to inject 'default.json' first
+      if @samples['default'] then merge @samples['default'], context
+      # Then try to inject the selected sample data (based on __sample querystring param)
+      selectedSample = if context.request.q?.__sample then context.request.q.__sample else 'default'
+      if selectedSample isnt 'default' and @samples[selectedSample]
+        merge @samples[selectedSample], context
+      context['$tests'] = tests.get context.request.page, selectedSample
+
       res.writeHead 200, 'Content-Type': 'text/html'
       try
         page = mustache.render @partials[@config.template], context, @partials

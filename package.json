@@ -30,7 +30,9 @@
     "mustache": "1.0.0",
     "mime": "1.2.11",
     "opn": "1.0.0",
-    "sse-stream": "0.0.4"
+    "sse-stream": "0.0.4",
+    "coffee-script": "1.8.0",
+    "ansi-to-html": "0.3.0"
   },
   "devDependencies": {
     "nodeunit": "*",

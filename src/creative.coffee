@@ -81,7 +81,7 @@ rescanSamples()
 saveConfig()
 
 httpserver = server.create config, partials, validFiles, samples
-$console.on 'ready', -> opn "http://localhost:#{config.port}/$console?__url=/", 'safari'
+$console.on 'ready', -> opn "http://localhost:#{config.port}/$console?__url=/"
 $console.install httpserver
 
 assets.watch()
