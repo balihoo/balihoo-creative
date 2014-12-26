@@ -6,6 +6,12 @@ colors    = require 'colors'
 parser    = require './urlparser'
 mustache  = require 'mustache'
 
+# Set up logging
+Messages  = require './messages'
+Messages.source = 'SERVER'
+Messages.setLevel 'DEBUG'
+msg = new Messages
+
 instance = null
 
 merge = (src, dest) ->
@@ -78,11 +84,10 @@ exports.start = (options) =>
     manager.on 'update', @console.refresh
 
   @assets.on 'update', =>
-    console.log "Saving new config assets".green
-    console.dir @assets.getAssets()
+    msg.debug "Assets updated, updating config"
     @config.updateAssets @assets.getAssets()
 
-  console.log "Starting server on port #{@config.getPort()}".green
+  msg.info "Starting server on port #{@config.getPort()}"
   instance.listen @config.getPort()
 
   "http://localhost:#{@config.getPort()}/$console"
