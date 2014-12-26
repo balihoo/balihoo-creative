@@ -41,7 +41,7 @@
   },
   "preferGlobal": "true",
   "bin": {
-    "balihoo-creative": "start.js"
+    "balihoo-creative": "index.js"
   },
   "keywords": ["balihoo"]
 }
