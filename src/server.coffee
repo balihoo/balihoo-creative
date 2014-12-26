@@ -21,6 +21,7 @@ exports.start = (options) =>
   @console = options.console || new (require './console')('$console')
 
   @config.updateAssets @assets.getAssets()
+  @console.updateSamples @samples.getSamples()
 
   notfound = (res, context) =>
     res.writeHead 404, 'Content-Type': 'text/html'

@@ -10,6 +10,7 @@ class SampleManager extends EventEmitter
   constructor: (@sampleDir) ->
     @samples = {}
     console.log "Watching directory: ".yellow +  "./#{@sampleDir}/".green
+    @scan()
     chokidar.watch("./#{@sampleDir}/", ignoreInitial: yes).on 'all', (event, path)=>
       console.log event, path
       if /\.json$/.test path
@@ -28,6 +29,9 @@ class SampleManager extends EventEmitter
 
   scan: (baseDir = process.cwd()) ->
     base = baseDir + "/" + @sampleDir 
+    if not fs.existsSync base
+      fs.mkdirSync base
+      @copy __dirname + '/../template/sampledata/', base
     @samples = {}
     for fileName in fs.readdirSync base
       if fileName.match /\.json$/
@@ -40,6 +44,8 @@ class SampleManager extends EventEmitter
   hasSample: (key) -> @samples.hasOwnProperty key
 
   getSample: (key) -> @samples[key]
+
+  getSamples: -> @samples
 
 module.exports = SampleManager
  
