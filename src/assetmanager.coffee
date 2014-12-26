@@ -5,41 +5,62 @@ colors    = require 'colors'
 chokidar        = require 'chokidar'
 {EventEmitter}  = require 'events'
 
-# Singleton attribute
-assetDir = null
-
-# Determine if a file should be ignored
-ignoreFile = (path) ->
-  /^\./.test(path) || /\/\./.test(path) || /~$/.test(path)
-
-# Create an event emitter for watching file changes
-class Watcher extends EventEmitter
-  ignoreConfigChange = no
-
-  # Watch the assets directory and see if any files change, add or delete
-  # We don't really care what happens to the directory, we'll just recompute all
-  watch: (assetDir = 'assets') =>
-    console.log "Watching directory: ".yellow +  "./#{assetDir}/".green
-    chokidar.watch("./#{assetDir}/", ignoreInitial: yes).on 'all', (event, path)=>
+class AssetManager extends EventEmitter
+  constructor: (@assetsDir = 'assets') ->
+    @assets = {}
+    @partials = {}
+    @staticFiles = {}
+    @isAsset = new RegExp "^#{@assetsDir}/"
+    console.log "Scanning directory: ".yellow +  "./#{@assetsDir}/".green
+    @scan()
+    console.log "Watching directory: ".yellow +  "./#{@assetsDir}/".green
+    chokidar.watch("./#{@assetsDir}/", ignoreInitial: yes).on 'all', (event, path) =>
       console.log event, path
-      if /\.balihoo-creative\.json$/.test path
-        if @ignoreConfigChange
-          @ignoreConfigChange = no
-        else
-          @emit 'config'
-      else if ignoreFile path || not /^assets\//.test path
-        return
-      else
-        @ignoreConfigChange = yes
+      if not @ignoreFile(path) && @isAsset.test(path)
+        @scan()
         @emit 'update'
-    # Return the event emitter for chainable 'on' calls
-    @
 
-module.exports = (assetDirectory) ->
-  assetDir = assetDirectory
+   scan: (baseDir = process.cwd()) ->
+    base = process.cwd() + "/" + @assetsDir
+    # If there is no assets directory, then we should build one
+    if not fs.existsSync base
+      console.log "Creating directory #{base}".yellow
+      fs.mkdirSync base
+      @rcopy __dirname + '/../template/assets/', base
 
-  # Recursively copy files from srcDir to destDir
-  rcopy: (srcDir, destDir, indent) ->
+    @staticFiles = {}
+    @partials = {}
+
+    walk = (cdir) =>
+      dir = {}
+      for fileName in fs.readdirSync cdir
+        assetPath = "#{cdir}/#{fileName}"
+        if not @ignoreFile assetPath
+          stat = fs.statSync assetPath
+          if stat.isDirectory()
+            # Asset directory key is directory name
+            dir[fileName] = walk assetPath
+          else
+            # Asset's key is file name without extension
+            key = fileName.replace /\.[^/.]+$/, ''
+            ext = (fileName.substr key.length + 1).toLowerCase()
+            rel = assetPath.substr base.length
+            if ext is 'mustache'
+              @partials[key] = fs.readFileSync(assetPath, encoding:'utf8')
+            else
+              @staticFiles[rel] =
+                path: "./#{@assetsDir}#{rel}" 
+                data: fs.readFileSync assetPath
+              dir[key] = "/_#{rel}"
+      dir
+    @assets = walk base
+
+  ignoreFile: (path) ->
+    /^\./.test(path)  || # Ignore files that start with .
+    /\/\./.test(path) || # Ignore files that start with /.
+    /~$/.test(path)      # Ignore files that end in ~
+
+  rcopy: (srcDir, destDir, indent = '  ') ->
     for fileName in fs.readdirSync srcDir
       srcPath = "#{srcDir}/#{fileName}"
       destPath = "#{destDir}/#{fileName}"
@@ -53,35 +74,19 @@ module.exports = (assetDirectory) ->
         console.log "#{indent}  #{fileName}".white
         fs.writeFileSync(destPath, fs.readFileSync(srcPath))
 
-  # Create a watcher and expose its watch function
-  watch: (new Watcher assetDir).watch
-  
-  # Return an object representation the files in the assets/ dir
-  scan: (baseDir = process.cwd()) ->
-    partials = {}
-    validFiles = {}
-    base = baseDir + "/" + assetDir
+  getAssetDir: -> @assetDir
 
-    walk = (cdir) ->
-      dir = {}
-      for fileName in fs.readdirSync cdir
-        assetPath = "#{cdir}/#{fileName}"
-        if not ignoreFile assetPath
-          stat = fs.statSync assetPath
-          if stat.isDirectory()
-            # Asset directory key is directory name
-            dir[fileName] = walk assetPath
-          else
-            # Asset's key is file name without extension
-            key = fileName.replace /\.[^/.]+$/, ''
-            ext = (fileName.substr key.length + 1).toLowerCase()
-            rel = assetPath.substr base.length
-            if ext is 'mustache'
-              partials[key] = fs.readFileSync(assetPath, encoding:'utf8')
-            else
-              validFiles["./#{assetDir}#{rel}"] = fs.readFileSync assetPath
-              dir[key] = "/_#{rel}"
-      dir
-    assets = walk base
-    [assets, partials, validFiles]
+  getAssets: -> @assets
+
+  hasPartial: (name) -> @partials.hasOwnProperty name
+
+  getPartial: (name) -> @partials[name]
+
+  getPartials: -> @partials
+
+  hasStaticFile: (name) -> @staticFiles.hasOwnProperty(name.substr 2)
+
+  getStaticFile: (name) -> @staticFiles[name.substr 2]
+
+module.exports = AssetManager
 

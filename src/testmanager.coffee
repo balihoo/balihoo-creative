@@ -8,10 +8,9 @@ chokidar        = require 'chokidar'
 Convert   = require 'ansi-to-html'
 convert   = new Convert newLine: yes
 
-class TestManager
+class TestManager extends EventEmitter
   constructor: (@testDir = 'test') ->
     @tests = {}
-    console.log "Scanning directory: ".yellow +  "./#{@testDir}/".green
     @scan()
     console.log "Watching directory: ".yellow +  "./#{@testDir}/".green
     chokidar.watch("./#{@testDir}/", ignoreInitial: yes).on 'all', (event, path) =>
@@ -30,6 +29,7 @@ class TestManager
 
   # Update the files 
   scan: (baseDir = process.cwd()) ->
+    console.log "Scanning directory: ".yellow +  "./#{@testDir}/".green
     base = baseDir + "/" + @testDir 
     if not fs.existsSync base
       fs.mkdirSync base
@@ -63,8 +63,6 @@ class TestManager
             </div>
           """
     @tests = tests
-    console.log "Test files:".blue
-    console.dir @tests
 
   get: (page, sample) ->
     key = "#{page}.#{sample}"

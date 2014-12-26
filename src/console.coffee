@@ -12,9 +12,9 @@ is_es = (req) ->
 
 class Console extends EventEmitter
   constructor: (@options = path: '$console') ->
+    @options = if typeof options is 'string' then path: options else options
     @clients = []
     @samples = {}
-    @options = if typeof options is 'string' then path: options else options
     @sse = (require 'sse-stream')("/#{@options.path}")
 
     # Load in the static HTML used to build the console
@@ -24,7 +24,7 @@ class Console extends EventEmitter
     chokidar.watch(consoleFile, ignoreInitial: yes).on 'change', (event, path) =>
       console.log 'Reloading the console HTML'.red
       @consoleContent = fs.readFileSync consoleFile
-      @reload()
+      @send 'reload'
 
    updateSamples: (samples) =>
     @samples = samples
@@ -74,9 +74,6 @@ class Console extends EventEmitter
       client.write msg
     else
       client.write msg for client in @clients
-
-  reload: =>
-    @send 'reload'
 
   refresh: =>
     @send 'refresh'

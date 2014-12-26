@@ -92,6 +92,10 @@
       $('#contentFrame').load(function() {
         navChange(null);
       });
+
+      $(window).on('beforeunload', function() {
+        es.close();
+      });
     });
     </script>
 
