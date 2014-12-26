@@ -15,7 +15,9 @@ class TestManager extends EventEmitter
     console.log "Watching directory: ".yellow +  "./#{@testDir}/".green
     chokidar.watch("./#{@testDir}/", ignoreInitial: yes).on 'all', (event, path) =>
       console.log event, path
-      if /\.coffee$/.test path then @scan()
+      if /\.coffee$/.test path
+        @scan()
+        @emit 'update'
 
   # Copy files from srcDir to destDir
   copy: (srcDir, destDir) ->
@@ -29,7 +31,6 @@ class TestManager extends EventEmitter
 
   # Update the files 
   scan: (baseDir = process.cwd()) ->
-    console.log "Scanning directory: ".yellow +  "./#{@testDir}/".green
     base = baseDir + "/" + @testDir 
     if not fs.existsSync base
       fs.mkdirSync base
@@ -39,7 +40,6 @@ class TestManager extends EventEmitter
       if fileName.match /\.coffee$/
         dataPath = "#{base}/#{fileName}"
         key = fileName.replace /\.[^/.]+$/, ''
-        console.log "Scanning test file #{dataPath} with key #{key}".red
         coffeeCode = fs.readFileSync(dataPath, encoding:'utf8')
         try
           scriptCode = coffee.compile coffeeCode
