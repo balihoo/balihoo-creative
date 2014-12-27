@@ -1,0 +1,15 @@
+
+<div class="bs-docs-header" id="content">
+  <div class="container">
+
+    <h1>Page not found</h1>
+    <p>Sorry, no content exists for page '{{request.page}}'</p>
+
+  </div>
+</div>
+<p>Redirecting to home page in 5 seconds...</p>
+<script>
+  window.setTimeout(function() {
+    window.location.href = '../index/';
+  }, 5000);
+</script>

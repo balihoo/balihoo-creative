@@ -29,7 +29,7 @@ class ConfigManager extends EventEmitter
       @config =
         name: projectName
         description: ''
-        pages: ['index']
+        pages: ['index', 'assets', 'sampledata', 'testing', 'customize', 'notfound']
         template: 'main'
         port: 8088
     else
