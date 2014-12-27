@@ -29,6 +29,7 @@
     </div>
 
    <script>
+    var es;
 
     nav.onkeydown = function(evt) {
       if(evt.keyCode == 13)
@@ -54,7 +55,7 @@
  
     $(function() {
       var iframe = $('#contentFrame').get(0);
-      var es = new EventSource('/$console')
+      es = new EventSource('/$console')
       var nav = $('#nav');
       es.onmessage = function(event) {
         e = JSON.parse(event.data);
@@ -93,9 +94,14 @@
         navChange(null);
       });
 
-      $(window).on('beforeunload', function() {
-        es.close();
-      });
+      function cleanUp() {
+        if(es !== null) {
+          es.close();
+          es = null;
+        }
+      }
+      $(window).on('beforeunload', cleanUp);
+      $(window).unload(cleanUp);
     });
     </script>
 

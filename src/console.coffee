@@ -47,7 +47,7 @@ class Console extends EventEmitter
       @send 'samples', @samples, client
 
       # Remove clients that close
-      client.on 'end', =>
+      client.once 'close', =>
         @clients.splice @clients.indexOf(client), 1
         msg.debug "Console close detected. Total clients #{(''+@clients.length).yellow}"
 
