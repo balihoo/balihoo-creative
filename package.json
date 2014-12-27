@@ -31,13 +31,12 @@
     "mime": "1.2.11",
     "opn": "1.0.0",
     "sse-stream": "0.0.4",
-    "coffee-script": "1.8.0",
+    "coffee-script": ">= 1.7.1",
     "ansi-to-html": "0.3.0"
   },
   "devDependencies": {
     "nodeunit": "*",
-    "docco": "*",
-    "coffee-script": ">= 1.7.1"
+    "docco": "*"
   },
   "preferGlobal": "true",
   "bin": {
