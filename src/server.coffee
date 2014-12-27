@@ -110,6 +110,10 @@ exports.start = (options) =>
     msg.debug "Assets updated, updating config"
     @config.updateAssets @assets.getAssets()
 
+  @samples.on 'update', =>
+    msg.debug "Samples changed, updating console"
+    @console.updateSamples @samples.getSamples()
+
   msg.info "Starting server on port #{@config.getPort()}"
   instance.listen @config.getPort()
 

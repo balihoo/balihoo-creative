@@ -52,7 +52,7 @@ class SampleManager extends EventEmitter
           data = JSON.parse fs.readFileSync(dataPath, encoding:'utf8')
           @samples[key] = data
       else
-        msg.debug "Ignoring file at #{dataPath.yellow}"
+        msg.debug "Ignoring file #{fileName.yellow}"
 
   hasSample: (key) -> @samples.hasOwnProperty key
 
