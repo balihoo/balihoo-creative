@@ -5,27 +5,37 @@ colors    = require 'colors'
 chokidar        = require 'chokidar'
 {EventEmitter}  = require 'events'
 
+# Set up logging
+Messages  = require './messages'
+msg = new Messages 'ASSETS'
+
 class AssetManager extends EventEmitter
   constructor: (@assetsDir = 'assets') ->
+    msg.debug 'Instantiating assetmanager'
     @assets = {}
     @partials = {}
     @staticFiles = {}
     @isAsset = new RegExp "^#{@assetsDir}/"
-    console.log "Scanning directory: ".yellow +  "./#{@assetsDir}/".green
+    msg.debug "Scanning directory: #{@assetsDir.yellow}"
     @scan()
-    console.log "Watching directory: ".yellow +  "./#{@assetsDir}/".green
+    msg.debug "Watching directory #{@assetsDir.yellow}"
     chokidar.watch("./#{@assetsDir}/", ignoreInitial: yes).on 'all', (event, path) =>
-      console.log event, path
+      msg.debug "Observed #{event}:#{path}"
       if not @ignoreFile(path) && @isAsset.test(path)
+        msg.debug "Handling #{event}:#{path}"
         @scan()
         @emit 'update'
+      else
+        msg.debug "Ignored #{event}:#{path}"
 
    scan: (baseDir = process.cwd()) ->
+    msg.debug "Scanning for asset files in #{baseDir.yellow}"
     base = process.cwd() + "/" + @assetsDir
     # If there is no assets directory, then we should build one
     if not fs.existsSync base
-      console.log "Creating directory #{base}".yellow
+      msg.info "Asset directory not found, creating #{base.yellow}"
       fs.mkdirSync base
+      msg.debug "Copying example asset files to #{base.yellow}"
       @rcopy __dirname + '/../template/assets/', base
 
     @staticFiles = {}
@@ -38,20 +48,26 @@ class AssetManager extends EventEmitter
         if not @ignoreFile assetPath
           stat = fs.statSync assetPath
           if stat.isDirectory()
+            msg.debug "Found directory #{assetPath.yellow}"
             # Asset directory key is directory name
             dir[fileName] = walk assetPath
           else
+            msg.debug "Found file #{assetPath.yellow}"
             # Asset's key is file name without extension
             key = fileName.replace /\.[^/.]+$/, ''
             ext = (fileName.substr key.length + 1).toLowerCase()
             rel = assetPath.substr base.length
             if ext is 'mustache'
+              msg.debug "Adding partial #{key.yellow}"
               @partials[key] = fs.readFileSync(assetPath, encoding:'utf8')
             else
+              msg.debug "Adding static file #{key.yellow}"
               @staticFiles[rel] =
                 path: "./#{@assetsDir}#{rel}" 
                 data: fs.readFileSync assetPath
               dir[key] = "/_#{rel}"
+        else
+          msg.warn "Ignoring #{assetPath.gray}"
       dir
     @assets = walk base
 
@@ -67,12 +83,14 @@ class AssetManager extends EventEmitter
 
       stat = fs.statSync srcPath
       if stat.isDirectory()
-        console.log "#{indent}#{fileName}/".white
+        msg.debug "#{indent}#{fileName.white}/"
         fs.mkdirSync destPath unless fs.existsSync destPath
         @rcopy srcPath, destPath, indent + '  ' 
       else if not fileName.match /\.swp$/
-        console.log "#{indent}  #{fileName}".white
+        msg.debug "#{indent}  #{fileName.white}"
         fs.writeFileSync(destPath, fs.readFileSync(srcPath))
+      else
+        msg.debug "#{indent}-ignored:#{fileName.gray}"
 
   getAssetDir: -> @assetDir
 

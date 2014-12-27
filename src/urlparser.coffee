@@ -1,6 +1,5 @@
 qs        = require 'querystring'
 path      = require 'path'
-colors    = require 'colors'
 parseURL  = (require 'url').parse
 
 fixKey = (str) ->

@@ -8,16 +8,24 @@ chokidar        = require 'chokidar'
 Convert   = require 'ansi-to-html'
 convert   = new Convert newLine: yes
 
+# Set up logging
+Messages  = require './messages'
+msg = new Messages 'TESTS'
+
 class TestManager extends EventEmitter
   constructor: (@testDir = 'test') ->
+    msg.debug 'Instantiating testmanager'
     @tests = {}
     @scan()
-    console.log "Watching directory: ".yellow +  "./#{@testDir}/".green
+    msg.debug "Watching directory: #{@testDir.yellow}"
     chokidar.watch("./#{@testDir}/", ignoreInitial: yes).on 'all', (event, path) =>
-      console.log event, path
+      msg.debug "Observed event #{event} on path #{path.yellow}"
       if /\.coffee$/.test path
+        msg.debug "Handling event #{event} on path #{path.yellow}"
         @scan()
         @emit 'update'
+      else
+        msg.debug "Ignoring event #{event} on path #{path.gray}"
 
   # Copy files from srcDir to destDir
   copy: (srcDir, destDir) ->
@@ -26,13 +34,15 @@ class TestManager extends EventEmitter
       destPath = "#{destDir}/#{fileName}"
       stat = fs.statSync srcPath
       if not stat.isDirectory() && fileName.match /\.coffee$/
-        console.log "  #{fileName}".white
+        msg.debug "  #{fileName.white}"
         fs.writeFileSync(destPath, fs.readFileSync(srcPath))
 
   # Update the files 
   scan: (baseDir = process.cwd()) ->
     base = baseDir + "/" + @testDir 
+    msg.debug "Scanning for test files in #{base.yellow}"
     if not fs.existsSync base
+      msg.info "Creating test directory and copying example tests in #{base.yellow}"
       fs.mkdirSync base
       @copy __dirname + '/../template/test/', base
     tests = {}
@@ -41,6 +51,7 @@ class TestManager extends EventEmitter
         dataPath = "#{base}/#{fileName}"
         key = fileName.replace /\.[^/.]+$/, ''
         coffeeCode = fs.readFileSync(dataPath, encoding:'utf8')
+        msg.debug "Adding test #{key} based on file #{dataPath.yellow}"
         try
           scriptCode = coffee.compile coffeeCode
           # Inject the unit testing framework
@@ -52,6 +63,7 @@ class TestManager extends EventEmitter
             <script>#{scriptCode}</script>
           """
         catch e
+          msg.error "Unable to compile test file #{dataPath}: #{e}"
           errorMessage = (convert.toHtml "#{e}").replace /(?:\r\n|\r|\n)/g, '<br/>'
           tests[key] = """
             <hr/>
@@ -62,6 +74,8 @@ class TestManager extends EventEmitter
               </code>
             </div>
           """
+      else
+        msg.debug "Ignoring file #{fileName.yellow}"
     @tests = tests
 
   get: (page, sample) ->
@@ -69,8 +83,7 @@ class TestManager extends EventEmitter
     if @tests[key]
       @tests[key]
     else
-      console.log "#{page} -- #{sample}"
-      console.dir @tests
+      msg.warn "No test file defined for page '#{page}' and sample '#{sample}'"
       restult = """
         <hr/>
         <div style="background-color: #EE5757;color:#000">

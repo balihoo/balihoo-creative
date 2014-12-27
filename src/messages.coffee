@@ -10,7 +10,9 @@ _levels =
 class Messages
 
   @level = _levels['DEBUG']
-  @source = 'SYSTEM'
+  source = 'SYSTEM'
+
+  constructor: (@source) ->
 
   @setLevel: (level = 'INFO') ->
     level = level.toUpperCase()
@@ -20,19 +22,19 @@ class Messages
       console.error "Unrecognized logging level #{level}, using 'DEBUG' instead"
       _levels['DEBUG']
 
-  @print: (msg, level = _levels['INFO']) ->
+  @print: (source, msg, level = _levels['INFO']) ->
     if level >= @level
-      msg = "#{@source}\t#{msg}"
+      msg = "#{source}\t#{msg}"
       switch level
         when _levels['DEBUG'] then console.log msg.cyan
         when _levels['INFO']  then console.log msg
         when _levels['WARN']  then console.log msg.magenta
         when _levels['ERROR'] then console.error msg.red
 
-  debug: (msg) -> Messages.print msg, _levels['DEBUG']
-  info : (msg) -> Messages.print msg, _levels['INFO']
-  warn : (msg) -> Messages.print msg, _levels['WARN']
-  error: (msg) -> Messages.print msg, _levels['ERROR']
+  debug: (msg) -> Messages.print @source, msg, _levels['DEBUG']
+  info : (msg) -> Messages.print @source, msg, _levels['INFO']
+  warn : (msg) -> Messages.print @source, msg, _levels['WARN']
+  error: (msg) -> Messages.print @source, msg, _levels['ERROR']
 
 module.exports = Messages
 
