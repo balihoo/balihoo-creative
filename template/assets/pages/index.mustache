@@ -3,8 +3,117 @@
   <div class="container">
 
     <h1>Getting started</h1>
-    <p>An overview of the Balihoo Web Designer Tookit, install it, use it, test your designs, and more.</p>
+    <p>An overview of the Balihoo Web Designer Tookit, install instructions, how to use it, test your designs, and more.</p>
 
   </div>
 </div>
+
+<div class="container bs-docs-container">
+
+  <div class="row">
+    <div class="col-md-9" role="main">
+
+      <div class="bs-docs-section">
+        <h1 id="install" class="page-header">Install</h1>
+
+        <p class="lead">The balihoo-creative utility is easy to install and run using node and npm. Please be sure that you already have nodejs and the npm installed. If you would like to help develop balihoo-creative then you should also install git on your workstation.</p>
+
+        <div class="row">
+
+          <div class="col-sm-4">
+            <h3 id="nodejs"><img src="{{assets.img.nodejs}}"/></h3>
+            <p>The utility is written in coffeescript and runs on the node.js platform.</p>
+            <p>
+              <a href="http://nodejs.org/download/" target="_parent"
+                  class="btn btn-lg btn-outline" role="button"> node.js </a>
+            </p>
+          </div>
+
+          <div class="col-sm-4">
+            <h3 id="npm"><img src="https://www.npmjs.com/static/images/npm-logo.png"/></h3>
+            <p>We use npm to package and distribute the balihoo-creative utility.</p>
+            <p>
+              <a href="https://www.npmjs.com/package/balihoo-creative" target="_parent"
+                  class="btn btn-lg btn-outline" role="button"> package info </a>
+            </p>
+          </div>
+
+          <div class="col-sm-4">
+            <h3 id="git-repo"><img src="{{assets.img.GitHub_Logo}}"/></h3>
+            <p>The source code for this project is hosted on GitHub. This project is open source.</p>
+            <p>
+              <a href="https://github.com/balihoo/balihoo-creative" target="_parent"
+                  class="btn btn-lg btn-outline" role="button"> source pepo </a>
+            </p>
+          </div>
+        </div>
+
+        <h3 id="npm-install">Install with npm</h3>
+        <p>You'll want to install this package globally so you can run it from anywhere in your shell.</p>
+        <div class="highlight">
+          <pre>
+            <code class="language-bash" data-lang="bash">npm -g install balihoo-creative</code></pre>
+        </div>
+
+      </div> <!--bs-docs-section -->
+
+      <div class="bs-docs-section">
+        <h1 id="run" class="page-header">Run</h1>
+
+        <p class="lead">The <code>balihoo-creative</code> utility has a built in web server that imitates a production local website server. It even watches your assets and templates to automatically refresh as you make updates.</p>
+
+
+        <h3 id="node-run">Running</h3>
+        <p>
+          You'll run the utility at the top level of your local site project.
+          When running it for the very first time, you'll want to do it in an empty directory so you can explore the example site that it creates (this site).
+        </p>
+        <div class="highlight"><pre><code class="language-bash" data-lang="bash">cd ~
+mkdir MyProject
+cd MyProject
+balihoo-creative</code></pre></div>
+
+        <p>If you want a lot more details about what's going on under the hood you can run it in verbose mode.</p>
+        <div class="highlight"><pre><code class="language-bash" data-lang="bash">balihoo-creative -v</code></pre></div>
+        <p>After you run it your browser should pop open to this tutorial, now hosted on your own machine. The app will continue to run until you kill it with <code>CTRL-c</code>
+
+        <h3 id="dir-structure">Directory Structure</h3>
+        <p>
+          The first thing you'll notice when you run <code>balihoo-creative</code> in is that it creates a bunch of files and directories. You should see something like this:
+        </p>
+        <div class="highlight"><pre><code>MyProject/
+  ├── assets/
+  │   ├── css
+  │   │   ├──bootstrap.css
+  │   │   ├──docs.css
+  │   │   └──theme.css
+  │   ├── img
+  │   │   ├──GitHub_Logo.png
+  │   │   ├──balihoo.png
+  │   │   ├──favicon.ico
+  │   │   └──nodejs.png
+  │   ├── js
+  │   │   ├──bootstrap.js
+  │   │   └──jquery.js
+  │   ├── pages
+  │   │   ├──assets.mustache
+  │   │   ├──customize.mustache
+  │   │   ├──index.mustache
+  │   │   ├──sampledata.mustache
+  │   │   └──testing.mustache
+  │   ├── main.mustache
+  │   └── navbar.mustache
+  ├── sampledata/
+  │   ├── default.json
+  │   └── sample1.json
+  └── test/
+      ├── index.default.coffee
+      └── index.sample1.coffee</code></pre></div>
+
+      </div> <!--bs-docs-section -->
+
+    </div> <!--main -->
+  </div> <!-- row -->
+
+</div> <!-- container -->
 
