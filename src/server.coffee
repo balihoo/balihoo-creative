@@ -95,7 +95,7 @@ exports.start = (options) =>
 
   @console.install instance
 
-  for manager in [@assets, @samples, @tests, @config]
+  for manager in [@assets, @tests, @config]
     msg.debug "Listening for updates on #{manager.constructor.name.yellow}"
     manager.on 'update', @console.refresh
 

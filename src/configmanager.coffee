@@ -16,12 +16,15 @@ class ConfigManager extends EventEmitter
     @ingoreNextUpdate = false
     @loadConfig()
     msg.debug "Watching config file: #{@configPath.yellow}"
-    chokidar.watch(@configPath, ignoreInitial: yes).on 'change', (event, path) =>
+    chokidar.watch(@configPath, {ignoreInitial: yes, interval: 50}).on 'change', (event, path) =>
       msg.debug 'Config file updated'
-      @loadConfig()
-      @emit 'update'
+      @needReload()
 
-  loadConfig: ->
+   needReload: ->
+    if @timer then clearTimeout @timer
+    @timer = setTimeout @loadConfig, 200
+
+  loadConfig: =>
     if not fs.existsSync @configPath
       # By default, use the current working directory as the project name
       projectName = path.basename process.cwd()
@@ -35,6 +38,7 @@ class ConfigManager extends EventEmitter
     else
       msg.debug "Loading project config file #{@configPath.yellow}"
       @config = JSON.parse fs.readFileSync(@configPath, encoding:'utf8')
+    @emit 'update'
 
   saveConfig: ->
     msg.debug "Saving config file #{@configPath.yellow}"

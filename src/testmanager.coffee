@@ -18,12 +18,11 @@ class TestManager extends EventEmitter
     @tests = {}
     @scan()
     msg.debug "Watching directory: #{@testDir.yellow}"
-    chokidar.watch("./#{@testDir}/", ignoreInitial: yes).on 'all', (event, path) =>
+    chokidar.watch("./#{@testDir}/", {ignoreInitial: yes, interval: 50}).on 'all', (event, path) =>
       msg.debug "Observed event #{event} on path #{path.yellow}"
       if /\.coffee$/.test path
         msg.debug "Handling event #{event} on path #{path.yellow}"
-        @scan()
-        @emit 'update'
+        @needScan()
       else
         msg.debug "Ignoring event #{event} on path #{path.gray}"
 
@@ -37,8 +36,12 @@ class TestManager extends EventEmitter
         msg.debug "  #{fileName.white}"
         fs.writeFileSync(destPath, fs.readFileSync(srcPath))
 
+   needScan: ->
+    if @timer then clearTimeout @timer
+    @timer = setTimeout @scan, 200
+
   # Update the files 
-  scan: (baseDir = process.cwd()) ->
+  scan: (baseDir = process.cwd()) =>
     base = baseDir + "/" + @testDir 
     msg.debug "Scanning for test files in #{base.yellow}"
     if not fs.existsSync base
@@ -77,6 +80,7 @@ class TestManager extends EventEmitter
       else
         msg.debug "Ignoring file #{fileName.yellow}"
     @tests = tests
+    @emit 'update'
 
   get: (page, sample) ->
     key = "#{page}.#{sample}"

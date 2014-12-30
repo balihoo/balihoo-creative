@@ -16,12 +16,11 @@ class SampleManager extends EventEmitter
     @samples = {}
     msg.debug "Watching directory: #{@sampleDir.yellow}"
     @scan()
-    chokidar.watch("./#{@sampleDir}/", ignoreInitial: yes).on 'all', (event, path)=>
+    chokidar.watch("./#{@sampleDir}/", {ignoreInitial: yes, interval: 50}).on 'all', (event, path)=>
       msg.debug "Observed #{event} at path #{path.yellow}"
       if /\.json$/.test path
         msg.debug "Handling change to #{path.yellow}"
-        @scan()
-        @emit 'update'
+        @needScan()
       else
         msg.debug "Ignoring change to #{path.yellow}"
 
@@ -35,7 +34,11 @@ class SampleManager extends EventEmitter
         msg.debug "  #{fileName.white}"
         fs.writeFileSync(destPath, fs.readFileSync(srcPath))
 
-  scan: (baseDir = process.cwd()) ->
+   needScan: ->
+    if @timer then clearTimeout @timer
+    @timer = setTimeout @scan, 200
+
+  scan: (baseDir = process.cwd()) =>
     base = baseDir + "/" + @sampleDir 
     if not fs.existsSync base
       msg.info "Creating samples directory at #{base.yellow}"
@@ -53,6 +56,7 @@ class SampleManager extends EventEmitter
           @samples[key] = data
       else
         msg.debug "Ignoring file #{fileName.yellow}"
+    @emit 'update'
 
   hasSample: (key) -> @samples.hasOwnProperty key
 

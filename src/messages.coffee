@@ -1,5 +1,6 @@
 
 require 'colors'
+moment = require 'moment'
 
 _levels =
   DEBUG: 0
@@ -24,7 +25,8 @@ class Messages
 
   @print: (source, msg, level = _levels['INFO']) ->
     if level >= @level
-      msg = "#{source}\t#{msg}"
+      now = new Date()
+      msg = "#{moment().format "HH:mm:ss.SSS"}\t#{source}\t#{msg}"
       switch level
         when _levels['DEBUG'] then console.log msg.cyan
         when _levels['INFO']  then console.log msg

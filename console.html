@@ -60,15 +60,13 @@
       es.onmessage = function(event) {
         e = JSON.parse(event.data);
         console.log("Got event " + e.event);
-        if(e.event === 'refresh') {
-          iframe.contentWindow.location.reload();
-        } else if(e.event === 'reload') {
+        if(e.event === 'reload') {
           es.close();
           window.location = window.location.pathname + '?__url='
             + encodeURIComponent(iframe.contentWindow.location);
         } else if(e.event === 'navigate') {
           iframe.src = e.data.path;
-        } else if(e.event === 'samples') {
+        } else if(e.event === 'refresh') {
           var sel = $('#samples');
           var selectedValue = sel.val() !== null && sel.val() !== '' ? sel.val() : 'default';
           sel.empty();
@@ -86,7 +84,6 @@
           // Set the initial path
           url = getParameterByName('__url') || '/';
           navChange(url);
-
         }
       }
 

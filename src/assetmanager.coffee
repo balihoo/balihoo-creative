@@ -19,16 +19,19 @@ class AssetManager extends EventEmitter
     msg.debug "Scanning directory: #{@assetsDir.yellow}"
     @scan()
     msg.debug "Watching directory #{@assetsDir.yellow}"
-    chokidar.watch("./#{@assetsDir}/", ignoreInitial: yes).on 'all', (event, path) =>
+    chokidar.watch("./#{@assetsDir}/", {ignoreInitial: yes, interval: 50}).on 'all', (event, path) =>
       msg.debug "Observed #{event}:#{path}"
       if not @ignoreFile(path) && @isAsset.test(path)
         msg.debug "Handling #{event}:#{path}"
-        @scan()
-        @emit 'update'
+        @needScan()
       else
         msg.debug "Ignored #{event}:#{path}"
 
-   scan: (baseDir = process.cwd()) ->
+   needScan: ->
+    if @timer then clearTimeout @timer
+    @timer = setTimeout @scan, 200
+
+   scan: (baseDir = process.cwd()) =>
     msg.debug "Scanning for asset files in #{baseDir.yellow}"
     base = process.cwd() + "/" + @assetsDir
     # If there is no assets directory, then we should build one
@@ -70,6 +73,7 @@ class AssetManager extends EventEmitter
           msg.warn "Ignoring #{assetPath.gray}"
       dir
     @assets = walk base
+    @emit 'update'
 
   ignoreFile: (path) ->
     /^\./.test(path)  || # Ignore files that start with .

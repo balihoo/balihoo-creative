@@ -32,7 +32,8 @@
     "opn": "1.0.0",
     "sse-stream": "0.0.4",
     "coffee-script": ">= 1.7.1",
-    "ansi-to-html": "0.3.0"
+    "ansi-to-html": "0.3.0",
+    "moment": ">= 2.8.4"
   },
   "devDependencies": {
     "nodeunit": "*",

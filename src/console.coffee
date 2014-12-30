@@ -18,6 +18,8 @@ class Console extends EventEmitter
     @options = if typeof options is 'string' then path: options else options
     @clients = []
     @samples = {}
+    @refreshCount = 0
+    @timer
     @sse = (require 'sse-stream')("/#{@options.path}")
     msg.debug "Instantiating console at #{@options.path.yellow}"
 
@@ -25,7 +27,7 @@ class Console extends EventEmitter
     # If it is updated then reload it and refresh all clients
     consoleFile = __dirname + '/../console.html' 
     @consoleContent = fs.readFileSync consoleFile
-    chokidar.watch(consoleFile, ignoreInitial: yes).on 'change', (event, path) =>
+    chokidar.watch(consoleFile, {ignoreInitial: yes, interval: 50}).on 'change', (event, path) =>
       msg.debug "Console file updated, reloading console in browser"
       @consoleContent = fs.readFileSync consoleFile
       @send 'reload'
@@ -33,7 +35,7 @@ class Console extends EventEmitter
    updateSamples: (samples) =>
     msg.debug "Samples updated, sending new samples to web clients"
     @samples = samples
-    @send 'samples', @samples
+    @refresh
 
    install: (server) =>
     # Inject the sse request handler
@@ -44,7 +46,7 @@ class Console extends EventEmitter
     @sse.on 'connection', (client) =>
       @clients.push client
       msg.debug "New console connection detected. Total clients #{(''+@clients.length).yellow}"
-      @send 'samples', @samples, client
+      @send 'refresh', @samples, client
 
       # Remove clients that close
       client.once 'close', =>
@@ -73,7 +75,9 @@ class Console extends EventEmitter
         msg.debug "Forwarding request for #{req.url.yellow}"
         l.call server, req, res for l in listeners
 
-    server.once 'listening', => @emit 'ready'
+    server.once 'listening', =>
+      @emit 'ready'
+
     @install = -> throw new Error 'cannot install console twice'
 
   send: (event, data = null, client = null) =>
@@ -88,8 +92,18 @@ class Console extends EventEmitter
       msg.debug "Sending #{event} to total clients: #{(''+@clients.length).yellow}"
       client.write message for client in @clients
 
+  handleRefresh: =>
+    @timer = null
+    msg.debug "Sending refresh message. Queue size #{@refreshCount}"
+    @refreshCount = 0
+    @send 'refresh', @samples
+
   refresh: =>
-    @send 'refresh'
+    # Don't send refresh immediately, bundle it up with other adjacent refreshes
+    @refreshCount++
+    if @timer then clearTimeout @timer
+    @timer = setTimeout @handleRefresh, 400
+    msg.debug "Queued refresh request ##{@refreshCount}"
 
 module.exports = (options) -> new Console options
 
