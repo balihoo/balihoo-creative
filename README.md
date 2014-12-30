@@ -2,20 +2,34 @@ Balihoo Web Designer Toolkit
 ============================
 
 `balihoo-creative` allows web and interactive designers to build customizable templates
-on their own desktop, using their favorite editors and compile tools. It interacts with
-Balihoo's online resources like Form-Builder & BLIP to make template design a seemless,
-painless experience.
+on their own workstation, using their favorite editors and compile tools. It integrates
+with Balihoo's online resources like Form-Builder & BLIP to make template design and
+maintenance a seemless, painless experience.
 
 ## Version
-0.0.1
+0.0.12
 
 ## Installation
-
-  npm install balihoo-creative
+  Make sure you have a recent version of node and npm installed and
+  then run:
+  ```shellscript
+  npm -g install balihoo-creative
+  ```
+  If npm is installed as root then you may have to run it using sudo.
 
 ## Usage
 
-## Credits
+  The app contains its own extensive documentation and tutorial. To view the docs
+  and tutorial: first, install the app, create an empty directory and run the app
+  within that directory.
+  ```shellscript
+  mkdir /tmp/project
+  cd /tmp/project
+  balihoo-creative
+  ```
+  Running the app in an empty directory will generate the tutorial project in that
+  directory, run the web server, and open your browser to the *Getting Started*
+  tutorial page.
 
 ## License
 
