@@ -48,7 +48,11 @@ exports.start = (options) =>
         msg.warn "Request for unknown sample file #{context.request.q.__sample.yellow}"
 
     # Add $tests to the context to inject tests in the page
-    context['$tests'] = @tests.get page, selectedSample
+    if context.request.q.__notests?
+      msg.debug "Skipping tests"
+    else
+      msg.debug "Injecting tests as $tests"
+      context['$tests'] = @tests.get page, selectedSample
 
     templateName = @config.getTemplate()
     if @assets.hasPartial templateName

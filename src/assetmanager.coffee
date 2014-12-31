@@ -70,7 +70,7 @@ class AssetManager extends EventEmitter
                 data: fs.readFileSync assetPath
               dir[key] = "/_#{rel}"
         else
-          msg.warn "Ignoring #{assetPath.gray}"
+          msg.debug "Ignoring #{assetPath.gray}"
       dir
     @assets = walk base
     @emit 'update'

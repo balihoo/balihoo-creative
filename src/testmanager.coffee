@@ -55,37 +55,55 @@ class TestManager extends EventEmitter
         key = fileName.replace /\.[^/.]+$/, ''
         coffeeCode = fs.readFileSync(dataPath, encoding:'utf8')
         msg.debug "Adding test #{key} based on file #{dataPath.yellow}"
+        tests[key] = {}
         try
-          scriptCode = coffee.compile coffeeCode
-          # Inject the unit testing framework
-          tests[key] = """
-            <link rel="stylesheet" href="//code.jquery.com/qunit/qunit-1.16.0.css">
-            <div id="qunit"></div>
-            <div id="qunit-fixture"></div>
-            <script src="//code.jquery.com/qunit/qunit-1.16.0.js"></script>
-            <script>#{scriptCode}</script>
-          """
+          tests[key].code = coffee.compile coffeeCode
         catch e
           msg.error "Unable to compile test file #{dataPath}: #{e}"
-          errorMessage = (convert.toHtml "#{e}").replace /(?:\r\n|\r|\n)/g, '<br/>'
-          tests[key] = """
-            <hr/>
-            <div style="background-color:black;color:green;">
-              <code style="white-space: pre;">
-                Error while compiling test file #{dataPath}:
-                #{errorMessage}
-              </code>
-            </div>
+          tests[key].error = """
+            Error while compiling test file #{dataPath}:
+            #{(convert.toHtml "#{e}").replace /(?:\r\n|\r|\n)/g, '<br/>'}
           """
       else
         msg.debug "Ignoring file #{fileName.yellow}"
     @tests = tests
     @emit 'update'
 
+  iftests: (k) =>
+    if @tests[k]?.code
+      msg.debug "Found test code for #{k}"
+      """
+        QUnit.module("#{k}");
+        #{@tests[k].code}
+      """
+    else
+      msg.debug "No tests for #{k}"
+      ''
+
   get: (page, sample) ->
     key = "#{page}.#{sample}"
-    if @tests[key]
-      @tests[key]
+    msg.debug "Assembling tests for #{key}"
+    # Assemble tests in main, main.sample, page, page.sample
+    testCode = @iftests("main") + @iftests("main.#{sample}") +
+      @iftests(page) + @iftests("#{page}.#{sample}")
+    if @tests[key]?.error
+      msg.error "Unable to render tests for #{key} because: #{@tests[key].error}"
+      """
+        <hr/>
+        <div style="background-color:black;color:green;">
+          <code style="white-space: pre;">
+            #{@tests[key].error}
+          </code>
+        </div>
+      """
+    else if testCode.length > 0
+      """
+        <link rel="stylesheet" href="//code.jquery.com/qunit/qunit-1.16.0.css">
+        <div id="qunit"></div>
+        <div id="qunit-fixture"></div>
+        <script src="//code.jquery.com/qunit/qunit-1.16.0.js"></script>
+        <script>#{testCode}</script>
+      """
     else
       msg.warn "No test file defined for page '#{page}' and sample '#{sample}'"
       restult = """

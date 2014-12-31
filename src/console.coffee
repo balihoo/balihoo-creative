@@ -1,5 +1,6 @@
 
 fs        = require 'fs'
+fpath     = require 'path'
 colors    = require 'colors'
 parser    = require './urlparser'
 chokidar        = require 'chokidar'
@@ -25,17 +26,23 @@ class Console extends EventEmitter
 
     # Load in the static HTML used to build the console
     # If it is updated then reload it and refresh all clients
-    consoleFile = __dirname + '/../console.html' 
-    @consoleContent = fs.readFileSync consoleFile
-    chokidar.watch(consoleFile, {ignoreInitial: yes, interval: 50}).on 'change', (event, path) =>
+    @consoleFile = fpath.join __dirname, '..', 'template', 'console.html' 
+    @consoleContent = fs.readFileSync @consoleFile
+    msg.debug "Watching console file at #{@consoleFile.yellow}"
+    chokidar.watch(@consoleFile, {ignoreInitial: yes, interval: 50}).on 'change', (event, path) =>
       msg.debug "Console file updated, reloading console in browser"
-      @consoleContent = fs.readFileSync consoleFile
-      @send 'reload'
+      if @timer then clearTimeout @timer
+      @timer = setTimeout @needsReload, 200
 
-   updateSamples: (samples) =>
+  needsReload: () =>
+    @timer = null
+    @consoleContent = fs.readFileSync @consoleFile
+    @send 'reload'
+
+  updateSamples: (samples) =>
     msg.debug "Samples updated, sending new samples to web clients"
     @samples = samples
-    @refresh
+    @refresh()
 
    install: (server) =>
     # Inject the sse request handler
@@ -62,11 +69,16 @@ class Console extends EventEmitter
       # If the $console page is requested then serve it up
       if request.page is @options.path && not is_es req
         if request?.ifdata
-          res.writeHead 200, 'Content-Type': 'application/json'
           msg.debug "Console request for data #{request.data.yellow}"
-          res.end JSON.stringify switch request.data
-            when 'samples' then @samples
-            else error: "Unknown console data request #{request.data}"
+          switch request.data
+            when 'samples'
+              res.writeHead 200, 'Content-Type': 'application/json'
+              res.end JSON.stringify @samples
+            when 'URI.js'
+              @serveStatic res, 'URI.js'
+            else
+              res.writeHead 404
+              res.end JSON.stringify error: "Unknown console data request #{request.data}"
         else
           msg.debug "Serving up console html content"
           res.writeHead 200, 'Content-Type': 'text/html'
@@ -79,6 +91,15 @@ class Console extends EventEmitter
       @emit 'ready'
 
     @install = -> throw new Error 'cannot install console twice'
+
+  serveStatic: (res, fileName) ->
+    filePath = fpath.join __dirname, '..', 'template', fileName
+    stat = fs.statSync filePath
+    res.writeHead 200,
+        'Content-Type': 'application/javascript'
+        'Content-Length': stat.size
+    rs = fs.createReadStream filePath
+    rs.pipe res
 
   send: (event, data = null, client = null) =>
     message = JSON.stringify
