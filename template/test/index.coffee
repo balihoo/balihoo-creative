@@ -1,6 +1,6 @@
 
 QUnit.test "Navigation", (assert) ->
-  active = $('li.active')
+  active = $('header#top li.active')
   assert.equal active.text().trim(), 'Getting started', 'Active nav is Getting started page'
 
 QUnit.test "Content", (assert) ->

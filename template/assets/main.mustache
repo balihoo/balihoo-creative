@@ -20,10 +20,10 @@
     <!-- Favicon -->
     <link rel="icon" href="{{assets.img.favicon}}">
 
+    <script src="{{assets.js.jquery}}"></script>
   <head>
 
   <body>
-    {{{$tests}}}
     <!-- Nav bar -->
     {{> navbar}}
 
@@ -37,9 +37,11 @@
     {{> footer}}
 
     <!-- Javascript -->
-    <script src="{{assets.js.jquery}}"></script>
+    <script src="{{assets.js.sidenav}}"></script>
     <script src="{{assets.js.bootstrap}}"></script>
-    
+    <script src="{{assets.js.docs}}"></script>
+
+    {{{$tests}}}
   </body>
 
 </html>

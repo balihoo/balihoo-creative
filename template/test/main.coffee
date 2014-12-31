@@ -7,7 +7,7 @@ QUnit.test "Basic page layout", (assert) ->
   assert.ok nav.is(':visible'), 'The nav header is visible'
 
   # Get the active navigation item
-  active = $ 'li.active'
+  active = $ 'header#top li.active'
   assert.strictEqual active.length, 1, 'Exactly one nav item is active'
 
   # Get the content page header
@@ -21,4 +21,9 @@ QUnit.test "Basic page layout", (assert) ->
   main = $ 'div[role=main]'
   assert.strictEqual main.length, 1, 'Exactly one main content area'
   assert.ok $('div.bs-docs-section', main).length > 0, 'Page has at least one content section'
+
+  # Get main topic and sidebar nav counts, they should match
+  navCount = $('nav.bs-docs-sidebar ul').length - 1
+  sectionCount = $('.bs-docs-section h1.page-header').length
+  assert.strictEqual navCount, sectionCount, 'The side nav should have as many sections as the document'
 

@@ -102,7 +102,14 @@ class TestManager extends EventEmitter
         <div id="qunit"></div>
         <div id="qunit-fixture"></div>
         <script src="//code.jquery.com/qunit/qunit-1.16.0.js"></script>
-        <script>#{testCode}</script>
+        <script>
+          QUnit.config.scrolltop = false;
+          QUnit.done(function(details){
+            if(parent && typeof parent.testsDone === 'function')
+              parent.testsDone(details)
+          });
+          #{testCode}
+        </script>
       """
     else
       msg.warn "No test file defined for page '#{page}' and sample '#{sample}'"
