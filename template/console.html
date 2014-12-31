@@ -58,6 +58,7 @@
         <td>
           <label for="nav">Preview URI</label>
           <input id="nav" type="text" size="60" value="/"/>
+          <button id="newtab" title="Open in a new tab - no console">&#8599;</button>
         </td>
         <td>
           <label for="samples">Sample Data</label>
@@ -96,6 +97,11 @@
       window.setInterval(function() {
         nav.val(iframe.contentWindow.location);
       }, 100);
+
+      $('#newtab').click(function() {
+        var win = window.open(iframe.contentWindow.location, '_blank');
+          win.focus();
+      });
 
       es.onmessage = function(event) {
         e = JSON.parse(event.data);
