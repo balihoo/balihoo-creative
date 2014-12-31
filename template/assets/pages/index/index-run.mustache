@@ -1,0 +1,41 @@
+<div class="bs-docs-section">
+  <h1 id="run" class="page-header">Run</h1>
+
+  <p class="lead">The <code>balihoo-creative</code> utility has a built in web server that imitates a production local website server. It even watches your assets and templates to automatically refresh as you make updates.</p>
+
+
+  <h3 id="node-run">Running</h3>
+  <p>
+    You'll run the utility at the top level of your local site project.
+    When running it for the very first time, you'll want to do it in an empty directory so you can explore the example site that it creates (this site).
+  </p>
+  <div class="highlight"><pre><code class="language-bash" data-lang="bash">cd ~
+mkdir MyProject
+cd MyProject
+balihoo-creative</code></pre></div>
+
+  <p>If you want a lot more details about what's going on under the hood you can run it in verbose mode.</p>
+  <div class="highlight"><pre><code class="language-bash" data-lang="bash">balihoo-creative -v</code></pre></div>
+  <p>After you run it your browser should pop open to this tutorial, now hosted on your own machine. The app will continue to run until you kill it with <code>CTRL-c</code>
+
+  <h3 id="dir-structure">Directory Structure</h3>
+  <p>
+    The first thing you'll notice when you run <code>balihoo-creative</code> in is that it creates a bunch of files and directories. You should see something like the following. We'll cover each of these files and in a minute. If any of these top level files or directories does not already exist in your project then the app will create it for you and populate it with example files from this tuturoial.
+  </p>
+
+  <div class="highlight"><pre><code>{{> directory}}</code></pre></div>
+
+  <h3 id="console">The Console</h3>
+  <p>
+    You have noticed by now that running the app causes the browser to pop open a new tab with a live preview of the local site. If you look carefully, there is a panel at the top of the browser window containing a url bar and a pull-down box.</p>
+
+  {{^textonly}}
+    <p>This is the console.</p>
+    <img src="{{assets.img.console}}"/>
+  {{/textonly}}
+
+  <p>
+    The console runs your site in an iframe and communicates with the app to determine when it should refresh your site. You can directly browse to different pages by updating the URL in the navigation box, but generally you should just use the links within your site itself. You will notice that the nav box updates with the current URL when you click around to different links in your site. We'll discuss the pull-down box in a minute.
+  </p>
+</div> <!--bs-docs-section -->
+

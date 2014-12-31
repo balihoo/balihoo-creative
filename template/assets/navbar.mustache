@@ -8,7 +8,14 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a href="../" class="navbar-brand"><img src="{{assets.img.balihoo}}"/></a>
+      {{#textonly}}
+        <a href="http://balihoo.com" target="_parent" class="navbar-brand">{{name}}</a>
+      {{/textonly}}
+      {{^textonly}}
+        <a href="http://balihoo.com" target="_parent" alt="{{name}}" class="navbar-brand withimg">
+          <img src="{{assets.img.balihoo}}"/>
+        </a>
+      {{/textonly}}
     </div>
     <nav class="collapse navbar-collapse bs-navbar-collapse">
       <ul class="nav navbar-nav">
