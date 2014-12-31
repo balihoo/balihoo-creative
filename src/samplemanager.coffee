@@ -54,6 +54,8 @@ class SampleManager extends EventEmitter
         try
           data = JSON.parse fs.readFileSync(dataPath, encoding:'utf8')
           @samples[key] = data
+        catch err
+          msg.error "Unable to parse sample file #{dataPath}:\n#{err}"
       else
         msg.debug "Ignoring file #{fileName.yellow}"
     @emit 'update'
