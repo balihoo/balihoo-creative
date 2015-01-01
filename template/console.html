@@ -93,7 +93,8 @@
       // If the iframe's url changes, update it
       // There is no event if the frame doesn't actually reload (e.g. fragment changes)
       window.setInterval(function() {
-        nav.val(iframe.contentWindow.location);
+        if($('#nav:focus').length == 0 && nav.val() != iframe.contentWindow.location)
+          nav.val(iframe.contentWindow.location);
       }, 100);
 
       $('#newtab').click(function() {
