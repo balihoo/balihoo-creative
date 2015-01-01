@@ -16,7 +16,7 @@ class ConfigManager extends EventEmitter
     @ingoreNextUpdate = false
     @loadConfig()
     msg.debug "Watching config file: #{@configPath.yellow}"
-    chokidar.watch(@configPath, {ignoreInitial: yes, interval: 50}).on 'change', (event, path) =>
+    chokidar.watch(@configPath, {persistent: yes, ignoreInitial: yes, interval: 50}).on 'change', (event, path) =>
       msg.debug 'Config file updated'
       @needReload()
 
@@ -35,6 +35,7 @@ class ConfigManager extends EventEmitter
         pages: ['index', 'assets', 'sampledata', 'test', 'config', 'notfound']
         template: 'main'
         port: 8088
+      @saveConfig()
     else
       msg.debug "Loading project config file #{@configPath.yellow}"
       @config = JSON.parse fs.readFileSync(@configPath, encoding:'utf8')
@@ -43,13 +44,6 @@ class ConfigManager extends EventEmitter
   saveConfig: ->
     msg.debug "Saving config file #{@configPath.yellow}"
     fs.writeFileSync @configPath, JSON.stringify(@config, null, '  ')
-
-  updateAssets: (assets) ->
-    msg.debug "Updating assets section of config file"
-    @config.assets = assets
-    @saveConfig()
-
-  getAssets: -> @config.assets
 
   hasPage: (page) -> page in @config.pages
 

@@ -25,7 +25,6 @@ exports.start = (options) =>
   @samples = options.samples || new (require './samplemanager')('sampledata')
   @console = options.console || new (require './console')(path: '$console', config: @config)
 
-  @config.updateAssets @assets.getAssets()
   @console.updateSamples @samples.getSamples()
 
   renderPage = (res, context, page) =>
@@ -100,11 +99,8 @@ exports.start = (options) =>
   # Install the console into the HTTP server
   @console.install instance
 
-  # When assets change, update the console and the config
-  @assets.on 'update', =>
-    msg.debug "Assets changed, updating console & config"
-    @console.refresh()
-    @config.updateAssets @assets.getAssets()
+  # When assets change, update the console
+  @assets.on 'update', @console.refresh
 
   # When the tests change, update the console
   @tests.on 'update', @console.refresh
