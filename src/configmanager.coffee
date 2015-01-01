@@ -32,7 +32,7 @@ class ConfigManager extends EventEmitter
       @config =
         name: projectName
         description: ''
-        pages: ['index', 'assets', 'sampledata', 'testing', 'customize', 'notfound']
+        pages: ['index', 'assets', 'sampledata', 'test', 'config', 'notfound']
         template: 'main'
         port: 8088
     else
@@ -58,6 +58,8 @@ class ConfigManager extends EventEmitter
   getTemplate: -> @config.template
 
   getPort: -> @config.port
+
+  getContext: -> @config
 
 module.exports = (configPath) -> new ConfigManager configPath
 

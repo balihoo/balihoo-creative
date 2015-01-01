@@ -23,7 +23,7 @@ exports.start = (options) =>
   @config  = options.config  || new (require './configmanager')('./.balihoo-creative.json')
   @tests   = options.tests   || new (require './testmanager')('test')
   @samples = options.samples || new (require './samplemanager')('sampledata')
-  @console = options.console || new (require './console')('$console')
+  @console = options.console || new (require './console')(path: '$console', config: @config)
 
   @config.updateAssets @assets.getAssets()
   @console.updateSamples @samples.getSamples()
@@ -99,7 +99,7 @@ exports.start = (options) =>
 
   @console.install instance
 
-  for manager in [@assets, @tests, @config]
+  for manager in [@assets, @tests]
     msg.debug "Listening for updates on #{manager.constructor.name.yellow}"
     manager.on 'update', @console.refresh
 

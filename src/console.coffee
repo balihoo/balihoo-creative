@@ -3,7 +3,8 @@ fs        = require 'fs'
 fpath     = require 'path'
 colors    = require 'colors'
 parser    = require './urlparser'
-chokidar        = require 'chokidar'
+chokidar  = require 'chokidar'
+mustache  = require 'mustache'
 {EventEmitter}  = require 'events'
 
 # Set up logging
@@ -15,7 +16,7 @@ is_es = (req) ->
   req.method is 'GET' && (!!~accept.indexOf('text/event-stream') || !!~accept.indexOf('text/x-dom-event-stream'))
 
 class Console extends EventEmitter
-  constructor: (@options = path: '$console') ->
+  constructor: (@options = path: '$console', config: null) ->
     @options = if typeof options is 'string' then path: options else options
     @clients = []
     @samples = {}
@@ -27,16 +28,26 @@ class Console extends EventEmitter
     # Load in the static HTML used to build the console
     # If it is updated then reload it and refresh all clients
     @consoleFile = fpath.join __dirname, '..', 'template', 'console.html' 
-    @consoleContent = fs.readFileSync @consoleFile
+    @consoleContent = @getConsoleContent()
     msg.debug "Watching console file at #{@consoleFile.yellow}"
     chokidar.watch(@consoleFile, {ignoreInitial: yes, interval: 50}).on 'change', (event, path) =>
       msg.debug "Console file updated, reloading console in browser"
       if @timer then clearTimeout @timer
       @timer = setTimeout @needsReload, 200
 
+    if @options.config
+      @options.config.on 'update', @needsReload
+
+  getConsoleContent: () =>
+    text = fs.readFileSync(@consoleFile).toString()
+    if @options.config
+      mustache.render fs.readFileSync(@consoleFile).toString(), @options.config.getContext()
+    else
+      text
+
   needsReload: () =>
-    @timer = null
-    @consoleContent = fs.readFileSync @consoleFile
+    if @timer then clearTimeout @timer
+    @consoleContent = @getConsoleContent();
     @send 'reload'
 
   updateSamples: (samples) =>
