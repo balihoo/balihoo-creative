@@ -47,7 +47,7 @@ class TestManager extends EventEmitter
     if not fs.existsSync base
       msg.info "Creating test directory and copying example tests in #{base.yellow}"
       fs.mkdirSync base
-      @copy path.normalize(__dirname + '/../template/test/'), base
+      @copy path.normalize(__dirname + '/../tutorial/test/'), base
     tests = {}
     for fileName in fs.readdirSync base
       if fileName.match /\.coffee$/

@@ -39,7 +39,7 @@ class AssetManager extends EventEmitter
       msg.info "Asset directory not found, creating #{base.yellow}"
       fs.mkdirSync base
       msg.debug "Copying example asset files to #{base.yellow}"
-      @rcopy path.normalize(__dirname + '/../template/assets/'), base
+      @rcopy path.normalize(__dirname + '/../tutorial/assets/'), base
 
     @staticFiles = {}
     @partials = {}

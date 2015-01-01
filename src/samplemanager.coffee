@@ -44,7 +44,7 @@ class SampleManager extends EventEmitter
       msg.info "Creating samples directory at #{base.yellow}"
       fs.mkdirSync base
       msg.debug "Copying example sample files to #{base.yellow}"
-      @copy path.normalize(__dirname + '/../template/sampledata/'), base
+      @copy path.normalize(__dirname + '/../tutorial/sampledata/'), base
     @samples = {}
     for fileName in fs.readdirSync base
       if fileName.match /\.json$/
