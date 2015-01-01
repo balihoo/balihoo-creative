@@ -28,10 +28,14 @@
     {{> navbar}}
 
     <!-- Page layout -->
-    {{#request.ifpage}}
-      {{#index}}{{> index}}{{/index}}
-      {{#notfound}}{{> notfound}}{{/notfound}}
-    {{/request.ifpage}}
+    {{#request}}
+      {{#ifpage.index}}      {{> index}}      {{/ifpage.index}}
+      {{#ifpage.assets}}     {{> assets}}     {{/ifpage.assets}}
+      {{#ifpage.sampledata}} {{> sampledata}} {{/ifpage.sampledata}}
+      {{#ifpage.test}}       {{> test}}       {{/ifpage.test}}
+      {{#ifpage.config}}     {{> config}}     {{/ifpage.config}}
+      {{#ifpage.notfound}}   {{> notfound}}   {{/ifpage.notfound}}
+    {{/request}}
 
     <!-- Footer -->
     {{> footer}}

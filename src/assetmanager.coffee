@@ -44,7 +44,7 @@ class AssetManager extends EventEmitter
     @staticFiles = {}
     @partials = {}
 
-    walk = (cdir) =>
+    walk = (cdir, prefix = '') =>
       dir = {}
       for fileName in fs.readdirSync cdir
         assetPath = "#{cdir}/#{fileName}"
@@ -53,7 +53,7 @@ class AssetManager extends EventEmitter
           if stat.isDirectory()
             msg.debug "Found directory #{assetPath.yellow}"
             # Asset directory key is directory name
-            dir[fileName] = walk assetPath
+            dir[fileName] = walk assetPath, "#{prefix}#{path.basename assetPath}-"
           else
             msg.debug "Found file #{assetPath.yellow}"
             # Asset's key is file name without extension
@@ -61,6 +61,7 @@ class AssetManager extends EventEmitter
             ext = (fileName.substr key.length + 1).toLowerCase()
             rel = assetPath.substr base.length
             if ext is 'mustache'
+              key = prefix+key
               msg.debug "Adding partial #{key.yellow}"
               @partials[key] = fs.readFileSync(assetPath, encoding:'utf8')
             else
