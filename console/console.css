@@ -1,0 +1,47 @@
+body {
+  position: fixed;
+  overflow: hidden;
+  width: 100%;
+  margin: 0px;
+  font-family: "Arial Black";
+}
+table#toolbar {
+  padding: 0px;
+  border: 0px;
+  margin-left: auto;
+  margin-right: auto;
+  border-spacing: 10px;
+  height: 75px;
+}
+tbody, tr, td {
+  height: 100%;
+}
+.passed {
+  margin-left: 10px;
+  color: #0a0;
+}
+.failed {
+  margin-left: 10px;
+  color: #f00;
+}
+label {
+  display: block;
+  padding-bottom: 0px;
+}
+td {
+  margin: 0px;
+  padding: 4px;
+  background-color: #eee;
+  text-align: center;
+}
+iframe {
+  border: 0px;
+  border-top-style: ridge;
+  border-top-width: 3px;
+  width: 100%;
+  height: calc(100% - 75px);
+}
+#qunit-header, #qunit-testrunner-toolbar {
+  display: none;
+}
+

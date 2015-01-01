@@ -99,14 +99,21 @@ class TestManager extends EventEmitter
       """
     else if testCode.length > 0
       """
-        <link rel="stylesheet" href="//code.jquery.com/qunit/qunit-1.16.0.css">
         <div id="qunit"></div>
         <div id="qunit-fixture"></div>
+        <style>
+          .qunit-dialog .ui-dialog-titlebar {
+            display: none;
+          }
+        </style>
         <script src="//code.jquery.com/qunit/qunit-1.16.0.js"></script>
+        <link rel="stylesheet" href="//code.jquery.com/qunit/qunit-1.16.0.css">
+        <link rel="stylesheet" href="//code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css">
         <script>
           QUnit.config.scrolltop = false;
           QUnit.done(function(details){
             if(parent && typeof parent.testsDone === 'function')
+              details.qunit = document.getElementById('qunit');
               parent.testsDone(details)
           });
           #{testCode}

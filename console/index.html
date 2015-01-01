@@ -1,0 +1,42 @@
+<html>
+  <head>
+    <title>{{name}}</title>
+    <link rel="stylesheet" href="{{static}}/console.css">
+    <link type="image/x-icon" rel="shortcut icon" href="{{static}}/favicon.ico">
+    <script src="http://code.jquery.com/jquery-1.11.2.js"></script>
+    <script src="{{static}}/jquery-ui.js"></script>
+    <script src="{{static}}/URI.js"></script>
+  </head>
+  <body>
+    <table id="toolbar">
+      <tr>
+        <td>
+          <label for="nav">Preview URI</label>
+          <input id="nav" type="text" size="60" value="/"/>
+          <button id="newtab" title="Open in a new tab - no console">&#8599;</button>
+        </td>
+        <td>
+          <label for="samples">Sample Data</label>
+          <select name="samples" id="samples" value="default"></select>
+        </td>
+        <td>
+          <label for="tests">No Tests</label>
+          <input type="checkbox" name="tests" id="tests"/>
+        </td>
+        <td id="testCell">
+          <label><a href="javascript:showTests()" target="contentFrame">Test Results</a></label>
+          <span id="testResults">...</span>
+        </td>
+      </tr>
+    </table>
+
+    <script src="{{static}}/console.js"></script>
+
+    <iframe id="contentFrame">
+      Your browser does not support iframes. Bummer.
+    </iframe>
+    <div id="testDialog">No tests have run</div>
+
+   </body>
+</html>
+
