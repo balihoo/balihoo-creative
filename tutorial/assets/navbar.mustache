@@ -22,6 +22,9 @@
         <li {{#request.ifpage.index}}class="active"{{/request.ifpage.index}}>
           <a href="../index/">Getting started</a>
         </li>
+        <li {{#request.ifpage.config}}class="active"{{/request.ifpage.config}}>
+          <a href="../config/">Configure</a>
+        </li>
         <li {{#request.ifpage.assets}}class="active"{{/request.ifpage.assets}}>
           <a href="../assets/">Assets</a>
         </li>
@@ -30,9 +33,6 @@
         </li>
         <li {{#request.ifpage.test}}class="active"{{/request.ifpage.test}}>
           <a href="../test/">Testing</a>
-        </li>
-        <li {{#request.ifpage.config}}class="active"{{/request.ifpage.config}}>
-          <a href="../config/">Configure</a>
         </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">

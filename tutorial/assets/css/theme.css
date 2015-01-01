@@ -9,8 +9,8 @@ a.navbar-brand.withimg{
 
 .bs-docs-header {
   background-color: #f8971d;
-  background-image: -webkit-gradient(linear,left top,left bottom,from(#f8971d),to(#e8870d));
-  background-image: -o-linear-gradient(top,#f8971d 0,#e8870d 100%);
+  background-image: -webkit-gradient(linear,left top,left bottom,from(#d07b0f),to(#f8971d));
+  background-image: -o-linear-gradient(top,#d07b0f 0,#f8971d 100%);
   color: #f0dec8;
 }
 
