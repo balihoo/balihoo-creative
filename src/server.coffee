@@ -94,18 +94,20 @@ exports.start = (options) =>
       renderPage res, context, 'notfound'
     else
       res.writeHead 404, 'Content-Type': 'text/html'
-      msg.warn "Custom 404 page not found. Please add 'notfound' to config"
+      msg.warn "Custom 'notfound' page not found. Please add 'notfound' to config"
       res.end 'Page Not Found'
 
+  # Install the console into the HTTP server
   @console.install instance
 
-  for manager in [@assets, @tests]
-    msg.debug "Listening for updates on #{manager.constructor.name.yellow}"
-    manager.on 'update', @console.refresh
-
+  # When assets change, update the console and the config
   @assets.on 'update', =>
-    msg.debug "Assets updated, updating config"
+    msg.debug "Assets changed, updating console & config"
+    @console.refresh()
     @config.updateAssets @assets.getAssets()
+
+  # When the tests change, update the console
+  @tests.on 'update', @console.refresh
 
   @samples.on 'update', =>
     msg.debug "Samples changed, updating console"
@@ -114,5 +116,8 @@ exports.start = (options) =>
   msg.info "Starting server on port #{@config.getPort()}"
   instance.listen @config.getPort()
 
-  "http://localhost:#{@config.getPort()}/$console"
+  # Return the URL of the server
+  addr = instance.address()
+  host = if addr.address is '0.0.0.0' then 'localhost' else addr.address
+  "http://#{host}:#{addr.port}/$console"
 

@@ -15,11 +15,11 @@ class AssetManager extends EventEmitter
     @assets = {}
     @partials = {}
     @staticFiles = {}
-    @isAsset = new RegExp "^#{@assetsDir}/"
+    @isAsset = new RegExp "^#{path.join @assetsDir, '/'}"
     msg.debug "Scanning directory: #{@assetsDir.yellow}"
     @scan()
     msg.debug "Watching directory #{@assetsDir.yellow}"
-    chokidar.watch("./#{@assetsDir}/", {ignoreInitial: yes, interval: 50}).on 'all', (event, path) =>
+    chokidar.watch("#{@assetsDir}", {ignoreInitial: yes, interval: 50}).on 'all', (event, path) =>
       msg.debug "Observed #{event}:#{path}"
       if not @ignoreFile(path) && @isAsset.test(path)
         msg.debug "Handling #{event}:#{path}"
@@ -33,13 +33,13 @@ class AssetManager extends EventEmitter
 
    scan: (baseDir = process.cwd()) =>
     msg.debug "Scanning for asset files in #{baseDir.yellow}"
-    base = process.cwd() + "/" + @assetsDir
+    base = path.join process.cwd(), @assetsDir
     # If there is no assets directory, then we should build one
     if not fs.existsSync base
       msg.info "Asset directory not found, creating #{base.yellow}"
       fs.mkdirSync base
       msg.debug "Copying example asset files to #{base.yellow}"
-      @rcopy __dirname + '/../template/assets/', base
+      @rcopy path.normalize(__dirname + '/../template/assets/'), base
 
     @staticFiles = {}
     @partials = {}
@@ -47,7 +47,7 @@ class AssetManager extends EventEmitter
     walk = (cdir, prefix = '') =>
       dir = {}
       for fileName in fs.readdirSync cdir
-        assetPath = "#{cdir}/#{fileName}"
+        assetPath = path.join cdir, fileName
         if not @ignoreFile assetPath
           stat = fs.statSync assetPath
           if stat.isDirectory()
@@ -57,17 +57,17 @@ class AssetManager extends EventEmitter
           else
             msg.debug "Found file #{assetPath.yellow}"
             # Asset's key is file name without extension
-            key = fileName.replace /\.[^/.]+$/, ''
-            ext = (fileName.substr key.length + 1).toLowerCase()
+            ext = path.extname fileName
+            key = path.basename fileName, ext
             rel = assetPath.substr base.length
-            if ext is 'mustache'
+            if ext is '.mustache'
               key = prefix+key
               msg.debug "Adding partial #{key.yellow}"
               @partials[key] = fs.readFileSync(assetPath, encoding:'utf8')
             else
               msg.debug "Adding static file #{key.yellow}"
               @staticFiles[rel] =
-                path: "./#{@assetsDir}#{rel}" 
+                path: "#{@assetsDir}#{rel}" 
                 data: fs.readFileSync assetPath
               dir[key] = "/_#{rel}"
         else
@@ -78,17 +78,17 @@ class AssetManager extends EventEmitter
 
   ignoreFile: (path) ->
     /^\./.test(path)  || # Ignore files that start with .
-    /\/\./.test(path) || # Ignore files that start with /.
+    /[\/\\]\./.test(path) || # Ignore files that start with /.
     /~$/.test(path)      # Ignore files that end in ~
 
   rcopy: (srcDir, destDir, indent = '  ') ->
     for fileName in fs.readdirSync srcDir
-      srcPath = "#{srcDir}/#{fileName}"
-      destPath = "#{destDir}/#{fileName}"
+      srcPath = path.join srcDir, fileName
+      destPath = path.join destDir, fileName
 
       stat = fs.statSync srcPath
       if stat.isDirectory()
-        msg.debug "#{indent}#{fileName.white}/"
+        msg.debug "#{indent}#{fileName.white}"
         fs.mkdirSync destPath unless fs.existsSync destPath
         @rcopy srcPath, destPath, indent + '  ' 
       else if not fileName.match /\.swp$/
