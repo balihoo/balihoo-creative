@@ -114,6 +114,11 @@ exports.start = (options) =>
 
   # Return the URL of the server
   addr = instance.address()
-  host = if addr.address is '0.0.0.0' then 'localhost' else addr.address
-  "http://#{host}:#{addr.port}/$console"
+  if not addr
+    message = "Unable to start server on port #{@config.getPort()}"
+    msg.error message
+    throw message
+  else
+    host = if addr.address is '0.0.0.0' then 'localhost' else addr.address
+    "http://#{host}:#{addr.port}/$console"
 
