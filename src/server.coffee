@@ -47,7 +47,7 @@ exports.start = (options) =>
         msg.warn "Request for unknown sample file #{context.request.q.__sample.yellow}"
 
     # Add $tests to the context to inject tests in the page
-    if context.request.q.__notests? || req.headers['referer']?.indexOf('$console') is -1
+    if context.request.q.__notests?
       msg.debug "Skipping tests"
     else
       msg.debug "Injecting tests as $tests"

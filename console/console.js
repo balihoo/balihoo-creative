@@ -85,6 +85,7 @@ $(function() {
     setSelectedNav();
     setSelectedSample();
     setTestSelection();
+    $('#testResults').html("...");
   });
 
   // Repopulate the nav bar based on the iframe's location
