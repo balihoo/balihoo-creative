@@ -1,0 +1,29 @@
+<!-- Switch the mustache Set Delimiter so I can display mustache... -->
+{{=<% %>=}}
+<div class="highlight"><pre><code class="language-mustache" data-lang="mustache">  &lt;body&gt;
+  &lt;!-- Nav bar --&gt;
+  {{&gt; navbar}}
+
+  &lt;!-- Page layout --&gt;
+  {{#request}}
+    {{#ifpage.index}}      {{&gt; index}}      {{/ifpage.index}}
+    {{#ifpage.assets}}     {{&gt; assets}}     {{/ifpage.assets}}
+    {{#ifpage.sampledata}} {{&gt; sampledata}} {{/ifpage.sampledata}}
+    {{#ifpage.test}}       {{&gt; test}}       {{/ifpage.test}}
+    {{#ifpage.config}}     {{&gt; config}}     {{/ifpage.config}}
+    {{#ifpage.notfound}}   {{&gt; notfound}}   {{/ifpage.notfound}}
+  {{/request}}
+
+  &lt;!-- Footer --&gt;
+  {{&gt; footer}}
+
+  &lt;!-- Javascript --&gt;
+  &lt;script src="{{assets.js.sidenav}}"&gt;&lt;/script&gt;
+  &lt;script src="{{assets.js.bootstrap}}"&gt;&lt;/script&gt;
+  &lt;script src="{{assets.js.docs}}"&gt;&lt;/script&gt;
+
+  {{{$tests}}}
+&lt;/body&gt;</code></pre>
+</div>
+<%={{ }}=%>
+

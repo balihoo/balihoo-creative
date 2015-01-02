@@ -1,0 +1,80 @@
+
+<div class="bs-docs-header" id="content">
+  <div class="container">
+
+    <h1>URLs</h1>
+    <p>How the app parses URLs and how you use them in your templates.</p>
+
+  </div>
+</div>
+
+<div class="container bs-docs-container">
+
+  <div class="row">
+
+    <div class="col-md-9" role="main">
+
+      <div class="bs-docs-section">
+        <h1 id="parsing" class="page-header">URL Parsing</h1>
+
+        <p class="lead">When the app handles a page request it parses URL and breaks it into an object that your templates can consume.</p>
+
+        <h3 id="page"><code>request.page</code></h3>
+        <p>The most basic URL component is the requested page. This is parsed by taking the first part of the URL path. If the path is empty then the page is assumed to be <code>index</code>. Because mustache is logicless, it is hard to use this request property on its own. Generally you will use <code>request.ifpage.<em>pagename</em></code> to switch your content based on the requested page.</p>
+        <p>When running in production the page may actually be preceded by other path elements that identify the site's location. For example, on your machine you may see <em>http://localhost:8088/products</em>, the app would identify the page as <em>products</em>. In production the request page would look more like <em>http://local.acme.com/springfield-il/89421/products</em>. In this case the server will recognize <em>/springfield-il/89421/</em> as the root of the url so that the page is still <em>products</em>.</p>
+
+        <div class="bs-callout bs-callout-warning" id="absolute-links">
+          <h4>Avoid Absolute Paths</h4>
+          <p><strong>Never use absolute paths</strong> when referencing pages and other internal content within your template. It may work locally when testing, but you cannot make any assumptions about the URL structure of the template once it has been published. You should always refer to other pages in your template using <code>href="../mypage/"</code>. Because the Balihoo Local Sites platform only supports top level pages within templates (i.e. no sub-directories) you can safely assume that all other pages are on the same directory level as the current page. For non-page assets, you should use the <code>asset</code> object and let the system resolve asset reference for you.</p>
+        </div>
+
+        <h3 id="ifpage"><code>request.ifpage</code></h3>
+        <p>The <code>request.ifpage</code> context variable is set up to help you make choices in mustache based on the current page. For example, the url of this page is <code>http://localhost:8088/urls/</code>. The context will contain a parsed request object that looks as follows:</p>
+        <div class="highlight"><pre><code class="language-js" data-lang="js">{
+  request: {
+    q: {},
+    path: '/urls/',
+    page: 'urls',
+    ifpage: {
+      urls: true
+    }
+}</code></pre></div>
+        <p>Notice that the <code>ifpage</code> object contains the property <code>urls:true</code>. This allows you to do the following type of faux-switch statement in mustache:</p>
+        {{> example}}
+
+        <h3 id="query"><code>request.q</code></h3>
+        <p>Access the URL's query string (everything after the ?) using <code>request.q</code>. For example, the querystring <em>?param=value&k=1&k=2&key+1=value 1</em> will produce the following within the <code>request</code>:</p>
+        <div class="highlight"><pre><code class="language-js" data-lang="js">"q":{
+ "param":"value",
+ "k": ["1","2"],
+ "key_1":"value 1"
+}</code></pre></div>
+        <p>Notice that it returns a key/value pair for each query parameter.</p>
+
+        <h4>Arrays</h4>
+        <p>If the same parameter is specified multiple times within the query string then it will be converted to an array. See <em>k</em> in the above example.</p>
+        <h4>White Space</h4>
+        <p>Any white space in a parameter name will be converted to <em>_</em> (underscore). See above example <em>key_1</em></p>
+
+        <h3 id="paths">Additional Paths</h3>
+        <p>The platform does not support nested pages or multiple levels of directories. Each path after the page will be parsed and stuffed into the request object. Here's an example: <em>http://localhost:8088/urls/one/two/three/four/five</em></p>
+
+        <div class="highlight"><pre><code class="language-js" data-lang="js">"request": {
+  "q":{},
+  "path":"/urls/one/two/three/four/five",
+  "ifpage":{"urls":true},
+  "page":"urls",
+  "ifone":{"two":true},
+  "one":"two",
+  "ifthree":{"four":true},
+  "three":"four"
+}</code></pre></div>
+      </div>
+      <p>Notice how it treats every-other path as a parameter name and the following path as the value for that parameter. Also note the treatment is similar to pages, creating an <em>if</em> helper object for each key/value pair. Also notice how the last path, <em>five</em> has mysteriously disappeared - it had no value, so it isn't put into the request object.</p>
+
+    </div>
+
+  </div>
+
+</div>
+

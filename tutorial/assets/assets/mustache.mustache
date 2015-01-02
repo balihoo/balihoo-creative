@@ -7,36 +7,11 @@
   <h3 id="what-is-mustache">What is Mustache?</h3>
   <p><a href="http://mustache.github.io/" target="_parent">Mustache</a> is a very basic language for creating logic-less templates. It uses a very simple tagging syntax that allows you to construct dynamic content. The dynamic nature of the content is driven based on the data <a href="#context">context</a> that used to render the template. We'll discuss the data later on in <a href="../sampledata">Sample Data</a>. If you are completely unfumaliar with templating using Mustache please read the <a href="http://mustache.github.io/mustache.5.html" target="_parent">documentation</a>.</p>
 
-<!-- Switch the mustache Set Delimiter so I can display mustache... -->
-{{=<% %>=}}
-
   <h3 id="example-mustache-template">Example Template</h3>
   <p>The following sample Mustache template comes from this tutorial, it is part of the main.mustache template:</p>
-  <div class="highlight"><pre><code class="language-mustache" data-lang="mustache">  &lt;body&gt;
-    &lt;!-- Nav bar --&gt;
-    {{&gt; navbar}}
+  {{> example}}
 
-    &lt;!-- Page layout --&gt;
-    {{#request}}
-      {{#ifpage.index}}      {{&gt; index}}      {{/ifpage.index}}
-      {{#ifpage.assets}}     {{&gt; assets}}     {{/ifpage.assets}}
-      {{#ifpage.sampledata}} {{&gt; sampledata}} {{/ifpage.sampledata}}
-      {{#ifpage.test}}       {{&gt; test}}       {{/ifpage.test}}
-      {{#ifpage.config}}     {{&gt; config}}     {{/ifpage.config}}
-      {{#ifpage.notfound}}   {{&gt; notfound}}   {{/ifpage.notfound}}
-    {{/request}}
-
-    &lt;!-- Footer --&gt;
-    {{&gt; footer}}
-
-    &lt;!-- Javascript --&gt;
-    &lt;script src="{{assets.js.sidenav}}"&gt;&lt;/script&gt;
-    &lt;script src="{{assets.js.bootstrap}}"&gt;&lt;/script&gt;
-    &lt;script src="{{assets.js.docs}}"&gt;&lt;/script&gt;
-
-    {{{$tests}}}
-  &lt;/body&gt;</code></pre></div>
-
+{{=<% %>=}}
   <h3 id="partials">{{> partials}}</h3>
   <p>The first use of Mustache in the previous example is <code>{{> navbar}}</code>, this called a partial reference. You'll use partials to break your pages, headers, footers, and other HTML content into separate files. If you look at the example template, you'll see that we are referencing a lot of different partials. The name that you use to refer to the partial depends on the directory that contains your <code>.mustache</code> file.</p>
 
