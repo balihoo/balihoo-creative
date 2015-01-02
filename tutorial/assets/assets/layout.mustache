@@ -1,11 +1,17 @@
 <div class="bs-docs-section">
-  <h1 id="run" class="page-header">Header</h1>
+  <h1 id="layout" class="page-header">Asset File Layout</h1>
 
-  <p class="lead">Leading paragraph</p>
+  <p class="lead">The way you name your asset files and directory structure will determine how you reference your assets within the mustache templates.</p>
 
+  <h3 id="assets-dir"><code>assets/</code> Directory</h3>
+  <p>Your project should have a top-level directory named <code>assets/</code>. When you run the app it will try to find this directory. If the directory does not already exist then the app will create the directory for you and populate it with example assets from this tutorial.</p>
 
-  <h3 id="node-run">Section</h3>
-  <p>Section paragraph</p>
+  <h3 id="sample-structure">Sample Directory Structure</h3>
+  <p>Take a look at how the asset files from this tutorial are arranged. Note that we use directories to help arrange the assets into different types and categories. You are free to organize your asset directory however you please. We'll see in the next section how your choice of organization will affect the way you reference assets in your templates.</p>
+  <div class="highlight"><pre><code>{{> assets-directory}}</code></pre></div>
+
+  <h3 id="asset-types">Two Types of Assets</h3>
+  <p>You can include many types of files in your project assets (e.g. .png, .css, .js, etc). However, their two basic types of assets that the system treats very differently: <a href="#mustache-assets">Mustache Assets</a> &amp; <a href="#static-assets">Static Assets</a></p>
 
 </div>
 

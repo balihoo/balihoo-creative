@@ -1,0 +1,22 @@
+
+<div class="bs-docs-section">
+  <h1 id="static-assets" class="page-header">Static Assets</h1>
+
+  <p class="lead">Any part of your site that isn't dynamically rendered <em>.mustache</em> is a static asset.</p>
+
+  <h3 id="static-files">Static Files</h3>
+  <p>Static assets include images, JavaScript files, style-sheets, and any other asset used in your design. Static assets should only include the final, compiled versions of your assets. Please do not include source files in your <code>assets/</code> directory. For example, if you are using Sass to build your CSS files, please do not include your Sass files or any preprocessing directives or Makefiles, just include the end product <em>.css</em> file. The same goes for any other pre-processing including minifiers, uglifiers, premailer, etc. Only include the final, production-ready files in your <code>assets</code> directory. See also <a href="#source-control">Source Control</a></p>
+
+  <h3 id="static-file-layout">Static File Layout</h3>
+  <p>All of your project's asset files will reside under the <code>assets/</code> directory. When you run the <code>balihoo-create</code> app it will scan your assets and organize them into an object that mimicks their directory organization. Take another look at our example asset layout used in this tutorial:</p>
+  <div class="highlight"><pre><code>{{> assets-directory}}</code></pre></div>
+
+  <p>Note that <code>balihoo.png</code> is located under <code>assets/img/</code>. So, when you want to reference our logo file within a mustache template you would do the following:
+{{=<% %>=}}
+  <div class="highlight"><pre><code class="language-mustache" data-lang="mustache">&lt;img src={{assets.img.balihoo}}/&gt;</code></pre></div>
+<%={{ }}=%>
+
+  <p>Note that we left off the extension <em>.png</em>. When you refer to static assets you strip away the file extension. This can cause problems if you aren't careful. For example, you would have a collision if you put both <code>balihoo.pdf</code> and <code>balihoo.png</code> in the same directory. Every static asset file in a given directory should have a unique basename.</p>
+
+</div>
+

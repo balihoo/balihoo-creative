@@ -1,0 +1,22 @@
+
+<div class="bs-docs-section">
+  <h1 id="context" class="page-header">Template Context</h1>
+
+  <p class="lead">The data that your mustache templates operate on is called the 'context'.</p>
+
+  <h3 id="data-context">Local Data</h3>
+  <p>Local Data refers to any data that is specific to the specific location (e.g. store, affiliate, dealer, franchise, etc) that your template is currently being rendered for. In the live production system this data comes from the BLIP data service. While testing on your local workstation this data comes from your sample data files. You can read more on that in <a href="../sampledata">Sample Data</a>. This data may include fields like <em>StoreName</em>, <em>HoursOfOperation</em>, etc. Local Data is plugged right into the top level of the template's context data.</p>
+
+  <h3 id="request-context">Request Data</h3>
+  <p>Before the page is rendered the local site server (or your running copy of <code>balihoo-creative</code>) parses the request to generate context data that you can use to determine which <em>page</em> was requested or the URL's query parameters. You can find more information on how the URL is parsed <a href="../urls">here</a>.</p>
+
+  <h3 id="asset-context">Assets</h3>
+  <p>As seen above, the context contains an <em>assets</em> section that represents your project's static assets.</p>
+
+{{=<% %>=}}
+  <h3 id="tests-context">{{{$tests}}}</h3>
+  <p>You may have noticed in the example template above that we included a reference to <code>{{{$tests}}</code>. <em>$tests</em> is a special value that will be inert on the live production system. When you are testing locally, it will generate the  javascript code that injects your tests into the template. More on testing <a href="../test/">here</a>.</p>
+<%={{ }}=%>
+
+</div>
+
