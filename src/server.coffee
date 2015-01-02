@@ -27,7 +27,7 @@ exports.start = (options) =>
 
   @console.updateSamples @samples.getSamples()
 
-  renderPage = (res, context, page) =>
+  renderPage = (req, res, context, page) =>
     msg.debug "Trying to render #{page.yellow}"
 
     # Inject the sample data - always try to inject 'default.json' first
@@ -47,7 +47,7 @@ exports.start = (options) =>
         msg.warn "Request for unknown sample file #{context.request.q.__sample.yellow}"
 
     # Add $tests to the context to inject tests in the page
-    if context.request.q.__notests?
+    if context.request.q.__notests? || req.headers['referer']?.indexOf('$console') is -1
       msg.debug "Skipping tests"
     else
       msg.debug "Injecting tests as $tests"
@@ -79,7 +79,7 @@ exports.start = (options) =>
 
     # 1) If this is one of our configured pages, serve it up
     if @config.hasPage context.request.page
-      renderPage res, context, context.request.page
+      renderPage req, res, context, context.request.page
     # 2) _ is a special page that indicates static content
     else if context.request.ifpage._? && @assets.hasStaticFile(context.request.path)
       msg.debug "Rendering static content for #{context.request.path.yellow}"
@@ -90,7 +90,7 @@ exports.start = (options) =>
     else if @config.hasPage 'notfound'
       msg.warn "Requested content not found #{req.url.yellow}"
       context.request.ifpage = {notfound: true}
-      renderPage res, context, 'notfound'
+      renderPage req, res, context, 'notfound'
     else
       res.writeHead 404, 'Content-Type': 'text/html'
       msg.warn "Custom 'notfound' page not found. Please add 'notfound' to config"

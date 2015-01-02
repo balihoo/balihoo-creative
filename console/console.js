@@ -22,7 +22,12 @@ $(function() {
   }, 100);
 
   $('#newtab').click(function() {
-    var win = window.open(iframe.contentWindow.location, '_blank');
+    // Normally the server checks the referer to enable tests
+    // But this first time the referer will be $console
+    // So, disable the tests manually.
+    var uri = URI(iframe.contentWindow.location)
+      .removeSearch('__notests').addSearch('__notests');
+    var win = window.open(uri, '_blank');
       win.focus();
   });
 
