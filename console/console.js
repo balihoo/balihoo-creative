@@ -90,10 +90,12 @@ $(function() {
       // Get a JQuery handle of the anchor tag
       var el = $(e);
       var uri = URI(el.attr('href')).removeSearch('__sample').removeSearch('__notests');
-      if(search.hasOwnProperty('__sample'))
-        uri.addSearch('__sample', search['__sample']);
-      if(search.hasOwnProperty('__notests'))
-        uri.addSearch('__notests', search['__notests']);
+      var keys = ['__sample', '__notests', 'module'];
+      for(i = 0; i < keys.length; i++) {
+        key = keys[i];
+        if(search.hasOwnProperty(key))
+          uri.addSearch(key, search[key]);
+      }
       el.attr('href', uri.toString());
     });
 
@@ -146,6 +148,8 @@ function showTests() {
 function clearTestResults() {
   // Clear the test results before navigation
   $('#testResults').html(". . .");
+  // Update the tab title to remove the check or x
+  document.title = document.title.replace(/^[\u2714\u2716] /i, "");
 }
 
 // Called be the iframe when tests are done
