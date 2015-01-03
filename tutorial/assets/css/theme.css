@@ -1,5 +1,5 @@
 
-a.navbar-brand.withimg{
+a.navbar-brand.withimg {
   padding: 5px 15px 5px 0px;
 }
 
@@ -30,5 +30,12 @@ a.navbar-brand.withimg{
 
 .btn-outline:hover, .btn-outline:focus, .btn-outline:active {
   background-color: #59595b;
+}
+
+.bs-docs-nav .navbar-nav>li>a:hover,
+.bs-docs-nav .navbar-nav>.active>a,
+.bs-docs-nav .navbar-nav>.active>a:hover {
+  color: #ab6612;
+  background-color: #dfdfdf;
 }
 

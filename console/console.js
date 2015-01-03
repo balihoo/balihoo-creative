@@ -82,10 +82,24 @@ $(function() {
 
   // When the iframe navigates, refresh the UI
   $('#contentFrame').load(function() {
+
+    var search = URI(iframe.contentWindow.location).search(true);
+    // Update all of the internal links to reflect the console setting
+    // The following JQuery abominations finds all the relative links in the iframe
+    $("a:not([href^='http'])", $($("#contentFrame").get(0).contentWindow.document)).each(function(i,e) {
+      // Get a JQuery handle of the anchor tag
+      var el = $(e);
+      var uri = URI(el.attr('href')).removeSearch('__sample').removeSearch('__notests');
+      if(search.hasOwnProperty('__sample'))
+        uri.addSearch('__sample', search['__sample']);
+      if(search.hasOwnProperty('__notests'))
+        uri.addSearch('__notests', search['__notests']);
+      el.attr('href', uri.toString());
+    });
+
     setSelectedNav();
     setSelectedSample();
     setTestSelection();
-    $('#testResults').html("...");
   });
 
   // Repopulate the nav bar based on the iframe's location
@@ -127,6 +141,11 @@ var qunitIsOpen = false;
 function showTests() {
   qunitIsOpen = true;
   $(qunit).dialog('open');
+}
+
+function clearTestResults() {
+  // Clear the test results before navigation
+  $('#testResults').html(". . .");
 }
 
 // Called be the iframe when tests are done

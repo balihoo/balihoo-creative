@@ -9,11 +9,12 @@
         <span class="icon-bar"></span>
       </button>
       {{#textonly}}
-        <a href="http://balihoo.com" target="_parent" class="navbar-brand">{{name}}</a>
+        <a href="{{corporateURL}}" target="_parent" class="navbar-brand">{{name}}</a>
       {{/textonly}}
       {{^textonly}}
-        <a href="http://balihoo.com" target="_parent" alt="{{name}}" class="navbar-brand withimg">
-          <img src="{{assets.img.balihoo}}"/>
+        <a href="{{corporateURL}}" target="_parent" alt="{{name}}" class="navbar-brand withimg">
+          {{#isacme}}<img src="{{assets.img.acme}}"/>{{/isacme}}
+          {{^isacme}}<img src="{{assets.img.balihoo}}"/>{{/isacme}}
         </a>
       {{/textonly}}
     </div>

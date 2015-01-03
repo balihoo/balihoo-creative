@@ -1,0 +1,8 @@
+{
+  "name": "ACME",
+  "isacme": true,
+  "corporateURL": "http://en.wikipedia.org/wiki/Acme_Corporation",
+  "links": [
+    {"label": "ACME Corp.", "url": "http://en.wikipedia.org/wiki/Acme_Corporation"}
+  ]
+}

@@ -1,5 +1,6 @@
 {
   "name": "Balihoo",
+  "corporateURL": "http://balihoo.com",
   "links": [
     {"label": "Balihoo.com", "url": "http://balihoo.com/"},
     {"label": "npm", "url": "https://www.npmjs.com/package/balihoo-creative"},

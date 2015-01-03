@@ -112,10 +112,16 @@ class TestManager extends EventEmitter
         <script>
           QUnit.config.scrolltop = false;
           QUnit.done(function(details){
-            if(parent && typeof parent.testsDone === 'function')
+            if(parent && typeof parent.testsDone === 'function') {
               details.qunit = document.getElementById('qunit');
               parent.testsDone(details)
+            }
           });
+          window.onbeforeunload = function() {
+            if(parent && typeof parent.clearTestResults === 'function') {
+              parent.clearTestResults();
+            }
+          }
           #{testCode}
         </script>
       """
