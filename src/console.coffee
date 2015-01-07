@@ -26,6 +26,7 @@ class Console extends EventEmitter
     @content = {}
     @clients = []
     @samples = {}
+    @indexPage = 'index.mustache'
     @refreshCount = 0
     @timer
     @sse = (require 'sse-stream')("/#{@options.path}")
@@ -125,12 +126,12 @@ class Console extends EventEmitter
             try
               context = static: "/#{@options.path}/static"
               merge @options.config.getContext(), context
-              res.end mustache.render "#{@content['index.html'].content}", context
+              res.end mustache.render "#{@content[@indexPage].content}", context
             catch err
-              res.end @content['index.html'].content +
-                "<script>alert('Error rendering console/index.html#{err}');</script>"
+              res.end @content[@indexPage].content +
+                "<script>alert('Error rendering console/#{@indexPage}#{err}');</script>"
           else
-            res.end @content['index.html'].content
+            res.end @content[@indexPage].content
       else # fall back to server's default request handlers
         msg.debug "Forwarding request for #{req.url.yellow}"
         l.call server, req, res for l in listeners

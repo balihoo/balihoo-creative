@@ -90,7 +90,7 @@ $(function() {
       // Get a JQuery handle of the anchor tag
       var el = $(e);
       var uri = URI(el.attr('href')).removeSearch('__sample').removeSearch('__notests');
-      var keys = ['__sample', '__notests', 'module'];
+      var keys = ['__sample', '__notests', 'module', 'hidepassed', 'noglobals', 'notrycatch'];
       for(i = 0; i < keys.length; i++) {
         key = keys[i];
         if(search.hasOwnProperty(key))
