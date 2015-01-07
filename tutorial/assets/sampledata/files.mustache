@@ -1,11 +1,57 @@
 <div class="bs-docs-section">
-  <h1 id="run" class="page-header">Header</h1>
+  <h1 id="sample-files" class="page-header">Sample Files</h1>
 
-  <p class="lead">Leading paragraph</p>
+  <p class="lead">Sample files are written in JSON and allow you to control the contextual data that is passed to your mustache templates.</p>
 
 
-  <h3 id="node-run">Section</h3>
-  <p>Section paragraph</p>
+  <h3 id="sample-dir"><code>sampledata</code> Directory</h3>
+  <p>You will have a directory in the base of your project called <code>sampledata/</code>. Here is an example of the sample files in this tutorial:</p>
+
+  <div class="highlight"><pre><code>sampledata/
+├── default.json
+├── acme.json
+└── textonly.json</code></pre></div>
+
+  <p>Each sample file represents a permutation of site customizations (i.e. local data) that you want to review and test while designing your template.</p>
+
+  <h3 id="default-json"><code>default.json</code> Sample File</h3>
+  <p>The balihoo-creative app expects that you will always have a sample file named <code>default.json</code>. This is a special file and is treated differently from other sample files. It is used as a baseline of data for all other samples. In this file you will set all of the default data attributes that you want to be available within all samples.</p>
+  <p>Here is the <code>default.json</code> that we are using in this tutorial:</p>
+
+  <div class="highlight"><pre><code class="language-js" data-lang="js">{
+  "name": "Balihoo",
+  "corporateURL": "http://balihoo.com",
+  "links": [
+    {"label": "Balihoo.com", "url": "http://balihoo.com/"},
+    {"label": "npm", "url": "https://www.npmjs.com/package/balihoo-creative"},
+    {"label": "GitHub", "url": "https://github.com/balihoo/balihoo-creative"},
+    {"label": "Tutorial (no console)", "url": "../"}
+  ]
+}</code></pre></div>
+
+  <h3 id="other-samples">Other Sample Files</h3>
+  <p>Every other sample file <em>inherits</em> from <code>default.json</code> to extend and override it with additional data. For example, here is the <code>acme.json</code> sample file from this tutorial:</p>
+
+  <div class="highlight"><pre><code class="language-js" data-lang="js">{
+  "name": "ACME",
+  "isacme": true,
+  "corporateURL": "http://en.wikipedia.org/wiki/Acme_Corporation",
+  "links": [
+    {"label": "ACME Corp.", "url": "http://en.wikipedia.org/wiki/Acme_Corporation"}
+  ]
+}</code></pre></div>
+
+  <p>In this example the <code>acme.json</code> file is altering all of the data from <code>default.json</code> and adds a new data attribute <em>isacme</em>. However, the <code>textonly.json</code> sample file only adds a new data attribute and inherits all of the original data attributes from <code>default.json</code>:
+
+  <div class="highlight"><pre><code class="language-js" data-lang="js">{
+  "textonly": true
+}</code></pre></div>
+
+  <h3 id="samples-in-console">Using Samples in the Console</h3>
+  <p>When reviewing your project with the <em>$console</em>, you can choose the sample file that is applied to your mustache templates. By default, the <code>default.json</code> sample file will be applied. When you change the selected sample, your browser will refresh the project view and apply the new sample.</p>
+
+  <h3 id="testing">Testing with Sample Data</h3>
+  <p>When running tests in the console, the tests that will be selected to run will depend on the sample data that is selected in console. More on this in <a href="../test/">Testing</a>.</p>
 
 </div>
 

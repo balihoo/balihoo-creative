@@ -1,11 +1,41 @@
+
 <div class="bs-docs-section">
-  <h1 id="run" class="page-header">Header</h1>
+  <h1 id="intro" class="page-header">Why Client-Side Test Automation?</h1>
+  <p class="lead">Modify and maintain your projects quickly and confidently.</p>
 
-  <p class="lead">Leading paragraph</p>
+  <p>Even the simplest local sites are subject to regressions, unforeseen complications, and browser compatibility issues. By building a suite of automated tests you can be assured that the site is reacting to various inputs and data exactly as you expect. When implementing new features and functionality, you write tests that assure correct behavior. When an issue is reported you build automated regression tests that ensure that issue never appears again without being caught.</p>
+  
+  <p>The only alternative to automated tests is painful, inefficient, and error-prone manual testing. With automated tests you get a much higher degree of coverage with every change, every time. Sometimes we are tempted to make small changes without retesting every bit of site functionality. Or, knowing that we have to retest every ounce of functionality with every change we are tempted to push back on even the smallest, simplest changes. Using automated front-end tests allows you to be agile and reactive to customer needs without anxiety or uneasiness.</p>
 
+</div>
 
-  <h3 id="node-run">Section</h3>
-  <p>Section paragraph</p>
+<div class="bs-docs-section">
+  <h1 id="coffee-qunit" class="page-header">CoffeeScript + QUnit</h1>
+
+  <p>Tests are are authored using <a href="http://coffeescript.org/" target="_parent">CoffeeScript</a> and automatically run in the console using the <a href="http://qunitjs.com/" target="_parent">QUnit</a> testing framework. Please review and familiarize yourself with the documentation of these technologies.</p>
+
+  <h3 id="test-dir"><code>test/</code> Directory</h3>
+  <p>You will have a <code>test/</code> directory in the base directory of your project. Your test files will all live in this directory. Here is the <code>test/</code> directory structure from this tutorial:
+
+  <div class="highlight"><pre><code>test/
+├── index.acme.coffee
+├── index.coffee
+├── main.coffee
+├── main.default.coffee
+└── main.textonly.coffee</code></pre></div>
+
+  <h3 id="naming-conv">Naming Convention</h3>
+  <p>The way you name your test files is very important, your tests will run on specific pages and for specific sample data sets depending on how you name your test files. The first part of the file name indicates which page your test will run on. For example, the tests in <code>index.coffee</code> will run whenever the <em>index</em> page is requested. They will not run when any other page is requested. However, the tests in the files that begin with <code>main.coffee</code> will run on every page request.</p>
+
+  <p>The second part of the file name tells the app that the tests should only run when the indicated sample is selected. For example, the tests defined in <code>main.textonly.coffee</code> will only run when the <em>textonly</em> sample is selected. They will run on every page when <em>textonly</em> is selected because they are part of the <em>main</em> test suites. However, the tests in <code>index.acem.coffee</code> will only run when the request is for the index page <strong>and</strong> the <em>acme</em> sample is selected.</p>
+
+  <h3 id="test-results">Test Results</h3>
+  <p>You can see the results of your tests when viewing your site in the <em>$console</em>:</p>
+  <img src="{{assets.img.test}}"/>
+  <p>The console will show you how many tests are passing out of the total number of tests that ran. If there were any failures you would see the number of failures in red text. Click the <a href="javascript:parent.showTests()">Show Tests</a> link to open an interactive QUnit dialog. This dialog will give you detail on every test that ran and will show more detail on the failures. There are various other options within this dialog that you can learn about in the <a href="http://qunitjs.com/cookbook/" target="_parent">QUnit documentation</a>.</p>
+  <img src="{{assets.img.qunit}}"/>
+  <p>To exit the QUnit dialog press &lt;ESC&gt; on the keyboard.</p>
+  <p>Note: if you switch to the <em>textonly</em> sample on this page you'll see that one of the tests fails. It asserts that there be no images on the page, which fails. Fixing this is left as an exercise for the reader.</p>
 
 </div>
 

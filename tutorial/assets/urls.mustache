@@ -69,12 +69,25 @@
   "ifthree":{"four":true},
   "three":"four"
 }</code></pre></div>
+
+        <p>Notice how it treats every-other path as a parameter name and the following path as the value for that parameter. Also note the treatment is similar to pages, creating an <em>if</em> helper object for each key/value pair. Also notice how the last path, <em>five</em> has mysteriously disappeared - it had no value, so it isn't put into the request object.</p>
+
       </div>
-      <p>Notice how it treats every-other path as a parameter name and the following path as the value for that parameter. Also note the treatment is similar to pages, creating an <em>if</em> helper object for each key/value pair. Also notice how the last path, <em>five</em> has mysteriously disappeared - it had no value, so it isn't put into the request object.</p>
+
+      <div class="bs-docs-section">
+        <h1 id="console-urls" class="page-header">URLs in the Console</h1>
+        <p>You may notice that the URLs in your project may occassionally have extra parameters when running inside the <code>$console</code>:</p>
+        <ul>
+          <li>__sample: Keeps track of the sample you have selected from page to page.</li>
+          <li>__notests: Don't run the tests or show the test results.</li>
+          <li>module, hidepassed, noglobals, notrycatch: Maintains QUnit settings.</li>
+        </ul>
+
+        <p>These extra parameters will have no effect in the live site and are only used while testing your project within the <code>$console</code>.</p>
+
+      </div>
 
     </div>
-
   </div>
-
 </div>
 
