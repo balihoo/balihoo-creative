@@ -13,9 +13,15 @@ maintenance a seemless, painless experience.
   Make sure you have a recent version of node and npm installed and
   then run:
   ```shellscript
-  npm -g install balihoo-creative
+  sudo npm -g install balihoo-creative
   ```
   If npm is installed as root then you may have to run it using sudo.
+
+## Updating
+  To update to the most recent version run:
+  ```shellscript
+  sudo npm -g update balihoo-creative
+  ```
 
 ## Usage
 
