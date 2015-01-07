@@ -2,7 +2,7 @@
   "author": "Paul Price <pprice@balihoo.com> (http://balihoo.com)",
   "name": "balihoo-creative",
   "description": "Desktop tools for Balihoo creative designers",
-  "version": "0.0.22",
+  "version": "0.0.25",
   "repository": {
     "type": "git",
     "url": "https://github.com/balihoo/balihoo-creative"
