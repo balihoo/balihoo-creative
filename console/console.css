@@ -5,16 +5,22 @@ body {
   margin: 0px;
   font-family: "Arial Black";
 }
-table#toolbar {
-  padding: 0px;
-  border: 0px;
-  margin-left: auto;
-  margin-right: auto;
-  border-spacing: 10px;
+.toolbar-wrapper {
+  margin: 0;
+  padding: 0;
   height: 75px;
+  width: 100%;
 }
-tbody, tr, td {
+.toolbar {
   height: 100%;
+  width: 80%;
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0;
+}
+.toolbar div {
+  width: 20%;
+  float: left;
 }
 .passed {
   margin-left: 10px;
