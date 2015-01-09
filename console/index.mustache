@@ -10,24 +10,24 @@
   <body>
     <div class="toolbar-wrapper">
       <div class="toolbar">
-        <div>
+        <div class="preview-uri pane">
           <label for="nav">Preview URI</label>
           <input id="nav" type="text" size="60" value="/"/>
           <button id="newtab" title="Open in a new tab - no console">&#8599;</button>
         </div>
-        <div>
+        <div class="pane">
           <label for="samples">Sample Data</label>
           <select name="samples" id="samples" value="default"></select>
         </div>
-        <div>
+        <div class="pane">
           <label for="samples">Sample Data</label>
           <select name="samples" id="samples" value="default"></select>
         </div>
-        <div>
+        <div class="pane">
           <label for="tests">No Tests</label>
             <input type="checkbox" name="tests" id="tests"/>
         </div>
-        <div id="testCell">
+        <div id="testCell" class="pane">
           <label><a href="javascript:showTests()" target="contentFrame">Test Results</a></label>
           <span id="testResults">...</span>
         </div>
