@@ -8,7 +8,7 @@ body {
 .toolbar-wrapper {
   margin: 0;
   padding: 0;
-  height: 75px;
+  height: 50px;
   width: 100%;
 }
 .toolbar {
@@ -20,22 +20,24 @@ body {
 }
 .pane {
   box-sizing: border-box;
-  padding: 5px 10px;
+  padding: 0 5px;
   border-left: 1px solid #fff;
   border-right: 1px solid #fff;
   width: 15%;
+  max-width: 15%;
   height: 100%;
   float: left;
   background: #eee;
 }
 .preview-uri.pane {
   width: 40%;
+  max-width: 40%;
 }
 input {
   max-width: 85%;
 }
 .publish {
-  margin-top: 20px;
+  margin-top: 10px;
 }
 .passed {
   margin-left: 10px;
@@ -48,6 +50,7 @@ input {
 label {
   display: block;
   padding-bottom: 0px;
+  font-size: 0.75em;
 }
 iframe {
   border: 0px;
@@ -58,5 +61,24 @@ iframe {
 }
 #qunit-header, #qunit-testrunner-toolbar {
   display: none;
+}
+
+@media (max-width: 800px) {
+  .toolbar-wrapper {
+    height: 35px;
+  }
+  label {
+    font-size: 10px;
+    line-height: 1em;
+    margin-top: 1px;
+  }
+  input {
+    max-width: 75%;
+    line-height: 1em;
+  }
+  .publish {
+    margin-top: 2px;
+    font-size: 10px;
+  }
 }
 
