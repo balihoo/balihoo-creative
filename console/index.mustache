@@ -8,30 +8,30 @@
     <script src="{{static}}/URI.js"></script>
   </head>
   <body>
-    <table id="toolbar">
-      <tr>
-        <td>
+    <div class="toolbar-wrapper">
+      <div class="toolbar">
+        <div class="preview-uri pane">
           <label for="nav">Preview URI</label>
           <input id="nav" type="text" size="60" value="/"/>
           <button id="newtab" title="Open in a new tab - no console">&#8599;</button>
-        </td>
-        <td>
+        </div>
+        <div class="pane">
           <label for="samples">Sample Data</label>
           <select name="samples" id="samples" value="default"></select>
-        </td>
-        <td>
+        </div>
+        <div class="pane">
           <label for="tests">No Tests</label>
-          <input type="checkbox" name="tests" id="tests"/>
-        </td>
-        <td id="testCell">
+            <input type="checkbox" name="tests" id="tests"/>
+        </div>
+        <div id="testCell" class="pane">
           <label><a href="javascript:showTests()" target="contentFrame">Test Results</a></label>
           <span id="testResults">...</span>
-        </td>
-        <td>
-          <button onclick="alert('Publish is not implemented.')">Publish Creative</button>
-        </td>
-       </tr>
-    </table>
+        </div>
+        <div class="pane">
+          <button class="publish" onclick="alert('Publish is not implemented.')">Publish Creative</button>
+        </div>
+      </div>
+    </div>
 
     <script src="{{static}}/console.js"></script>
 

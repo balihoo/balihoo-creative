@@ -5,16 +5,39 @@ body {
   margin: 0px;
   font-family: "Arial Black";
 }
-table#toolbar {
-  padding: 0px;
-  border: 0px;
-  margin-left: auto;
-  margin-right: auto;
-  border-spacing: 10px;
-  height: 75px;
+.toolbar-wrapper {
+  margin: 0;
+  padding: 0;
+  height: 50px;
+  width: 100%;
 }
-tbody, tr, td {
+.toolbar {
   height: 100%;
+  width: 80%;
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0;
+}
+.pane {
+  box-sizing: border-box;
+  padding: 0 5px;
+  border-left: 1px solid #fff;
+  border-right: 1px solid #fff;
+  width: 15%;
+  max-width: 15%;
+  height: 100%;
+  float: left;
+  background: #eee;
+}
+.preview-uri.pane {
+  width: 40%;
+  max-width: 40%;
+}
+input {
+  max-width: 85%;
+}
+.publish {
+  margin-top: 10px;
 }
 .passed {
   margin-left: 10px;
@@ -27,12 +50,7 @@ tbody, tr, td {
 label {
   display: block;
   padding-bottom: 0px;
-}
-td {
-  margin: 0px;
-  padding: 4px;
-  background-color: #eee;
-  text-align: center;
+  font-size: 0.75em;
 }
 iframe {
   border: 0px;
@@ -43,5 +61,24 @@ iframe {
 }
 #qunit-header, #qunit-testrunner-toolbar {
   display: none;
+}
+
+@media (max-width: 800px) {
+  .toolbar-wrapper {
+    height: 35px;
+  }
+  label {
+    font-size: 10px;
+    line-height: 1em;
+    margin-top: 1px;
+  }
+  input {
+    max-width: 75%;
+    line-height: 1em;
+  }
+  .publish {
+    margin-top: 2px;
+    font-size: 10px;
+  }
 }
 
