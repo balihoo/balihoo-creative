@@ -63,6 +63,17 @@ iframe {
   display: none;
 }
 
+.message-dialog .ui-dialog-titlebar-close {
+  display: none;
+}
+
+ul#messages {
+  padding-left: 0px;
+  margin: 0px;
+  list-style-type: none;
+  font-family: monospace;
+}
+
 @media (max-width: 800px) {
   .toolbar-wrapper {
     height: 35px;

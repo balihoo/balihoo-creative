@@ -22,6 +22,7 @@ is_es = (req) ->
 
 class Console extends EventEmitter
   constructor: (@options = path: '$console', config: null) ->
+    @publishing = no
     @options = if typeof options is 'string' then path: options else options
     @content = {}
     @clients = []
@@ -47,7 +48,7 @@ class Console extends EventEmitter
 
     # If the options file is updated then reload the console
     if @options.config
-      @options.config.on 'update', => @send 'reload'
+      @options.config.on 'update', => @send 'reload' unless @publishing
 
   ignoreFile: (fileName) ->
     fpath.basename(fileName).match /^\./
@@ -132,6 +133,10 @@ class Console extends EventEmitter
                 "<script>alert('Error rendering console/#{@indexPage}#{err}');</script>"
           else
             res.end @content[@indexPage].content
+      # If the requested page is "PUBLISH" then publish the form to form builder
+      else if request.page is '$publish' && not is_es req
+        @initiateFormPublish()
+        res.end "Publish request recieved"
       else # fall back to server's default request handlers
         msg.debug "Forwarding request for #{req.url.yellow}"
         l.call server, req, res for l in listeners
@@ -166,6 +171,18 @@ class Console extends EventEmitter
     if @timer then clearTimeout @timer
     @timer = setTimeout @handleRefresh, 400
     msg.debug "Queued refresh request ##{@refreshCount}"
+
+  initiateFormPublish: =>
+    @send 'opendialog', 'Form Publish In Progress...'
+    n = 1
+    for f in [1..10]
+      setTimeout =>
+        if n < 10
+          @send 'dialog', "Some more text #{n}."
+        else
+          @send 'closedialog'
+        n++
+      , f*500
 
 module.exports = (options) -> new Console options
 
