@@ -197,17 +197,17 @@ function publishCreative() {
 }
 
 function openDialog(title) {
+  $('#messages').empty();
   $('#messageDialog').dialog({
     autoOpen: true,
     title: title,
     resizable: false,
-    modal: true,
     resiable: false,
     closeOnEscape: false,
     width: 400,
     height: 250,
     position: {my: 'center top', at: 'center top+100'},
-    dialogClass: 'message-dialog',
+    dialogClass: 'message-dialog noclose',
     close: function () {
       $('button.publish').prop('disabled', false);
     }
@@ -215,15 +215,14 @@ function openDialog(title) {
 }
 
 function closeDialog() {
-  $('#messageDialog').dialog('close');
-  $('#messages').empty();
+  $('#messageDialog').dialog('option', 'dialogClass', '');
 	$('button.publish').prop('disabled', false);
 }
 
 function addDialogText(text) {
   var li = $('<li>').text(text);
   $('#messages').append(li);
-  $('#messageDialog').animate({
+  $('#messageDialog').clearQueue().animate({
     scrollTop: li.offset().top
   });
 }

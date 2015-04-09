@@ -37,6 +37,32 @@ maintenance a seemless, painless experience.
   directory, run the web server, and open your browser to the *Getting Started*
   tutorial page.
 
+## Contribute
+
+  To contribute to this project, first fork it on github. Then, clone your fork to
+  your workstation.
+  ```shellscript
+  git clone https://github.com/balihoo/balihoo-creative.git
+  cd balihoo-creative
+  ```
+
+  Then, run npm install and link the binary to your development copy.
+  ```shellscript
+  npm install
+  npm link
+  ```
+
+  This project is built using coffeescript that is transpiled to javascript.
+  Make sure that you have coffeescript installed globally.
+  ```shellscript
+  npm install -g coffee-script
+  ```
+  While developing you should run the following from the root of your project.
+  This will watch the source files and compile them as they change.
+  ```shellscript
+  coffee -o lib/ -cw src/
+  ```
+
 ## License
 
 The MIT License (MIT)

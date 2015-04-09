@@ -49,6 +49,9 @@ class Console extends EventEmitter
     # If the options file is updated then reload the console
     if @options.config
       @options.config.on 'update', => @send 'reload' unless @publishing
+    if @options.publisher
+      @options.publisher.on 'progress', (message) => @send 'dialog', message
+      @options.publisher.on 'complete', => @send 'closedialog'
 
   ignoreFile: (fileName) ->
     fpath.basename(fileName).match /^\./
@@ -174,15 +177,7 @@ class Console extends EventEmitter
 
   initiateFormPublish: =>
     @send 'opendialog', 'Form Publish In Progress...'
-    n = 1
-    for f in [1..10]
-      setTimeout =>
-        if n < 10
-          @send 'dialog', "Some more text #{n}."
-        else
-          @send 'closedialog'
-        n++
-      , f*500
+    @options.publisher.publish()
 
 module.exports = (options) -> new Console options
 

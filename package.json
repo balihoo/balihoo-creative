@@ -33,7 +33,10 @@
     "sse-stream": "0.0.4",
     "coffee-script": ">= 1.7.1",
     "ansi-to-html": "0.3.0",
-    "moment": ">= 2.8.4"
+    "moment": ">= 2.8.4",
+    "bluebird": "2.9.24",
+    "balihoo-dam-client": ">= 0.0.1",
+    "underscore": ">= 1.8.3"
   },
   "devDependencies": {
     "nodeunit": "*",

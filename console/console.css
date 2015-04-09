@@ -63,7 +63,7 @@ iframe {
   display: none;
 }
 
-.message-dialog .ui-dialog-titlebar-close {
+.message-dialog.noclose .ui-dialog-titlebar-close {
   display: none;
 }
 
