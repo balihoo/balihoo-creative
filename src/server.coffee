@@ -23,7 +23,7 @@ exports.start = (options) =>
   @config    = options.config    || new (require './configmanager')('./.balihoo-creative.json')
   @tests     = options.tests     || new (require './testmanager')('test')
   @samples   = options.samples   || new (require './samplemanager')('sampledata')
-  @publisher = options.publisher || new (require './publisher')(
+  @formbuilder = options.formbuilder || new (require './formbuilder')(
     assets:  @assets
     config:  @config
     samples: @samples
@@ -31,7 +31,7 @@ exports.start = (options) =>
   @console   = options.console   || new (require './console')(
     path: '$console'
     config: @config
-    publisher: @publisher
+    formbuilder: @formbuilder
   )
 
   @console.updateSamples @samples.getSamples()

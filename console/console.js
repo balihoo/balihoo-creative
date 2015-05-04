@@ -190,10 +190,10 @@ function testsDone(details) {
     showTests();
 }
 
-// Try to publish this creative template to the form-builder service
-function publishCreative() {
-	$('button.publish').prop('disabled', true);
-  $.post('/$publish', function() {});
+// Try to push this creative template to the form-builder service
+function pushCreative() {
+	$('button.push').prop('disabled', true);
+  $.post('/$push', function() {});
 }
 
 function openDialog(title) {
@@ -209,14 +209,14 @@ function openDialog(title) {
     position: {my: 'center top', at: 'center top+100'},
     dialogClass: 'message-dialog noclose',
     close: function () {
-      $('button.publish').prop('disabled', false);
+      $('button.push').prop('disabled', false);
     }
   });
 }
 
 function closeDialog() {
   $('#messageDialog').dialog('option', 'dialogClass', '');
-	$('button.publish').prop('disabled', false);
+	$('button.push').prop('disabled', false);
 }
 
 function addDialogText(text) {

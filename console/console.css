@@ -36,7 +36,7 @@ body {
 input {
   max-width: 85%;
 }
-.publish {
+.push {
   margin-top: 10px;
 }
 .passed {
@@ -87,7 +87,7 @@ ul#messages {
     max-width: 75%;
     line-height: 1em;
   }
-  .publish {
+  .push {
     margin-top: 2px;
     font-size: 10px;
   }

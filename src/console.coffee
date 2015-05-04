@@ -22,7 +22,7 @@ is_es = (req) ->
 
 class Console extends EventEmitter
   constructor: (@options = path: '$console', config: null) ->
-    @publishing = no
+    @pushing = no
     @options = if typeof options is 'string' then path: options else options
     @content = {}
     @clients = []
@@ -48,10 +48,10 @@ class Console extends EventEmitter
 
     # If the options file is updated then reload the console
     if @options.config
-      @options.config.on 'update', => @send 'reload' unless @publishing
-    if @options.publisher
-      @options.publisher.on 'progress', (message) => @send 'dialog', message
-      @options.publisher.on 'complete', => @send 'closedialog'
+      @options.config.on 'update', => @send 'reload' unless @pushing
+    if @options.formbuilder
+      @options.formbuilder.on 'progress', (message) => @send 'dialog', message
+      @options.formbuilder.on 'complete', => @send 'closedialog'
 
   ignoreFile: (fileName) ->
     fpath.basename(fileName).match /^\./
@@ -136,10 +136,10 @@ class Console extends EventEmitter
                 "<script>alert('Error rendering console/#{@indexPage}#{err}');</script>"
           else
             res.end @content[@indexPage].content
-      # If the requested page is "PUBLISH" then publish the form to form builder
-      else if request.page is '$publish' && not is_es req
-        @initiateFormPublish()
-        res.end "Publish request recieved"
+      # If the requested page is "push" then push the form to form builder
+      else if request.page is '$push' && not is_es req
+        @initiateFormPush()
+        res.end "Push request recieved"
       else # fall back to server's default request handlers
         msg.debug "Forwarding request for #{req.url.yellow}"
         l.call server, req, res for l in listeners
@@ -175,9 +175,9 @@ class Console extends EventEmitter
     @timer = setTimeout @handleRefresh, 400
     msg.debug "Queued refresh request ##{@refreshCount}"
 
-  initiateFormPublish: =>
-    @send 'opendialog', 'Form Publish In Progress...'
-    @options.publisher.publish()
+  initiateFormPush: =>
+    @send 'opendialog', 'Form push In Progress...'
+    @options.formbuilder.push()
 
 module.exports = (options) -> new Console options
 

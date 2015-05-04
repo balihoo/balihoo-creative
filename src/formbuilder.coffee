@@ -7,14 +7,14 @@ _         = require 'underscore'
 
 # Set up logging
 Messages  = require './messages'
-msg = new Messages 'PUBLISHER'
+msg = new Messages 'FORMBUILDER'
 
-class Publisher extends EventEmitter
+class FormBuilder extends EventEmitter
   constructor: (options = {}) ->
-    msg.debug "Instantiating Publisher"
-    @assets = options.assets || throw "Publisher requires assets"
-    @config = options.config || throw "Publisher requres config"
-    @samples= options.samples|| throw "Publisher requres samples"
+    msg.debug "Instantiating FormBuilder"
+    @assets = options.assets || throw "FormBuilder requires assets"
+    @config = options.config || throw "FormBuilder requres config"
+    @samples= options.samples|| throw "FormBuilder requres samples"
 
     dam.config
       formbuilder:
@@ -49,8 +49,8 @@ class Publisher extends EventEmitter
       .error (reason) ->
         reject "Upload of static assets failed because: #{reason}"
 
-  publish: ->
-    @emit 'progress', "Starting the publish process"
+  push: ->
+    @emit 'progress', "Starting the push process"
 
     @uploadAssets().then (urls) =>
       @emit 'progress', 'Done uploading static assets.'
@@ -114,5 +114,5 @@ class Publisher extends EventEmitter
       result = JSON.stringify urls[obj]
     result
 
-module.exports = (options) -> new Publisher options
+module.exports = (options) -> new FormBuilder options
 
