@@ -205,7 +205,7 @@ function openDialog(title) {
     resiable: false,
     closeOnEscape: false,
     width: 400,
-    height: 250,
+    height: 350,
     position: {my: 'center top', at: 'center top+100'},
     dialogClass: 'message-dialog noclose',
     close: function () {
