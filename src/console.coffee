@@ -176,7 +176,7 @@ class Console extends EventEmitter
     msg.debug "Queued refresh request ##{@refreshCount}"
 
   initiateFormPush: =>
-    @send 'opendialog', 'Form push In Progress...'
+    @send 'opendialog', 'Form Push In Progress...'
     @options.formbuilder.push()
 
 module.exports = (options) -> new Console options

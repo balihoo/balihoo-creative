@@ -54,21 +54,45 @@ class FormBuilder extends EventEmitter
 
     @uploadAssets().then (urls) =>
       @emit 'progress', 'Done uploading static assets.'
-      form = @generateForm urls
-      @emit 'progress', 'Saving creative form'
-      dam.saveForm @config.getContext().creativeFormId, form, (err, response) =>
-        if err
-          @emit 'progress', 'Failed to save creative form' + err
-          console.log "ERROR", err
-        else
-          @emit 'progress', 'Saved creative form'
-          @emit 'complete'
+      creativeForm = @generateForm urls
+      @emit 'progress', 'Saving creative form...'
+      creativeFormId = @config.getContext().creativeFormId
+
+      if creativeFormId is 0
+        @emit 'progress', "Form #{creativeFormId} does not exist."
+        @emit 'progress', 'Creating new form...'
+        dam.newForm creativeForm, (err, incomingMessage, response) =>
+          if err
+            @emit 'progress', 'Failed to save new creative form:'
+            @emit 'progress', err
+            console.log "ERROR", err
+          else
+            @emit 'progress', 'Saved new creative form.'
+            @emit 'progress', '***Form ID: ' + incomingMessage.body.formid + '***'
+            @emit 'complete'
+      else
+        dam.saveForm creativeFormId, creativeForm, (err, incomingMessage, response) =>
+          if err
+            @emit 'progress', 'Failed to save creative form:'
+            @emit 'progress', err
+            console.log "ERROR", err
+          else
+            @emit 'progress', 'Saved creative form.'
+            @emit 'progress', '***Form ID: ' + creativeFormId + '***'
+            @emit 'complete'
     .error (reason) =>
       @emit 'progress', reason
       @emit 'complete'
 
   generateForm: (urls) ->
     config = @config.getContext()
+    if config.companionFormId isnt 0
+      imports = [
+        importformid: config.companionFormId
+        namespace: 'companion'
+      ]
+    else
+      imports = []
 
     testData = _.extend
       request:
@@ -84,11 +108,8 @@ class FormBuilder extends EventEmitter
     brands: ['demo']
     type: 'Creative'
     description: config.description
-    endpoint: 205
-    imports: [
-      importformid: config.companionFormId
-      namespace: 'companion'
-    ]
+    endpoint: 293
+    imports: imports
     layout: @assets.getPartial @config.getTemplate()
     listsource: null
     model: """imports.companion.inject root

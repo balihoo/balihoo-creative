@@ -1,6 +1,6 @@
 PATH := ./node_modules/.bin:${PATH}
 
-.PHONY : init clean build dist publish
+.PHONY : init clean build watch dist publish
 
 init:
 	npm install
@@ -13,6 +13,9 @@ clean:
 
 build:
 	coffee -o lib/ -c src/
+
+watch:
+	coffee -o lib/ -cw src/
 
 dist: clean init build
 
