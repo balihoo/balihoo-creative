@@ -33,8 +33,9 @@ class ConfigManager extends EventEmitter
         name: projectName
         description: ''
         channel: 'Local Websites'
-        creativeFormId: 0 #209
-        companionFormId: 0 #208
+        creativeFormId: 0
+        companionFormId: 0
+        endpoint: 0
         pages: ['index', 'assets', 'urls', 'sampledata', 'test', 'config', 'notfound']
         template: 'main'
         port: 8088

@@ -115,7 +115,7 @@ class FormBuilder extends EventEmitter
     brands: ['demo']
     type: 'Creative'
     description: config.description
-    endpoint: 293
+    endpoint: config.endpoint
     imports: imports
     layout: @assets.getPartial @config.getTemplate()
     listsource: null
