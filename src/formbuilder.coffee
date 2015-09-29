@@ -57,6 +57,13 @@ class FormBuilder extends EventEmitter
       creativeForm = @generateForm urls
       @emit 'progress', 'Saving creative form...'
       creativeFormId = @config.getContext().creativeFormId
+      companionFormId = @config.getContext().companionFormId
+
+      if companionFormId is 0
+        @emit 'progress', "***"
+        @emit 'progress', "Warning: Companion form not found."
+        @emit 'progress', "Please create a companion form to associate with this creative form."
+        @emit 'progress', "***"
 
       if creativeFormId is 0
         @emit 'progress', "Form #{creativeFormId} does not exist."
