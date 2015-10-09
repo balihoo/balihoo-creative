@@ -121,7 +121,7 @@ class FormBuilder extends EventEmitter
     listsource: null
     model: """imports.companion.inject root
     
-    field 'request', visible: no, value: data.request
+    field 'request', visible: no
 
     field 'assets', visible: no, value: #{@toCoffeeString @assets.getAssets(), urls}
     """
