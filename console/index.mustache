@@ -2,6 +2,7 @@
   <head>
     <title>{{name}}</title>
     <link rel="stylesheet" href="{{static}}/console.css">
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css">
     <link type="image/x-icon" rel="shortcut icon" href="{{static}}/favicon.ico">
     <script src="http://code.jquery.com/jquery-1.11.2.js"></script>
     <script src="{{static}}/jquery-ui.js"></script>
@@ -28,7 +29,7 @@
           <span id="testResults">...</span>
         </div>
         <div class="pane">
-          <button class="publish" onclick="alert('Publish is not implemented.')">Publish Creative</button>
+          <button class="push" onclick="pushCreative();">Push Creative</button>
         </div>
       </div>
     </div>
@@ -39,6 +40,9 @@
       Your browser does not support iframes. Bummer.
     </iframe>
     <div id="testDialog">No tests have run</div>
+    <div id="messageDialog">
+      <ul id="messages"></ul>
+    </div>
 
    </body>
 </html>

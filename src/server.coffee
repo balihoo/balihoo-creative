@@ -19,11 +19,20 @@ merge = (src, dest) ->
 exports.start = (options) =>
   msg.debug 'Setting up HTTP server'
   options  = options || {}
-  @assets  = options.assets  || new (require './assetmanager')('assets')
-  @config  = options.config  || new (require './configmanager')('./.balihoo-creative.json')
-  @tests   = options.tests   || new (require './testmanager')('test')
-  @samples = options.samples || new (require './samplemanager')('sampledata')
-  @console = options.console || new (require './console')(path: '$console', config: @config)
+  @assets    = options.assets    || new (require './assetmanager')('assets')
+  @config    = options.config    || new (require './configmanager')('./.balihoo-creative.json')
+  @tests     = options.tests     || new (require './testmanager')('test')
+  @samples   = options.samples   || new (require './samplemanager')('sampledata')
+  @formbuilder = options.formbuilder || new (require './formbuilder')(
+    assets:  @assets
+    config:  @config
+    samples: @samples
+  )
+  @console   = options.console   || new (require './console')(
+    path: '$console'
+    config: @config
+    formbuilder: @formbuilder
+  )
 
   @console.updateSamples @samples.getSamples()
 

@@ -77,6 +77,12 @@ $(function() {
         // Reload the iframe
         iframe.contentWindow.location.reload();
       }
+    } else if(e.event === 'opendialog') {
+      openDialog(e.data);
+    } else if(e.event === 'dialog') {
+      addDialogText(e.data);
+    } else if(e.event === 'closedialog') {
+      closeDialog();
     }
   }
 
@@ -182,5 +188,42 @@ function testsDone(details) {
 
   if(qunitIsOpen)
     showTests();
+}
+
+// Try to push this creative template to the form-builder service
+function pushCreative() {
+	$('button.push').prop('disabled', true);
+  $.post('/$push', function() {});
+}
+
+function openDialog(title) {
+  $('#messages').empty();
+  $('#messageDialog').dialog({
+    autoOpen: true,
+    title: title,
+    resizable: false,
+    resiable: false,
+    closeOnEscape: false,
+    width: 400,
+    height: 350,
+    position: {my: 'center top', at: 'center top+100'},
+    dialogClass: 'message-dialog noclose',
+    close: function () {
+      $('button.push').prop('disabled', false);
+    }
+  });
+}
+
+function closeDialog() {
+  $('#messageDialog').dialog('option', 'dialogClass', '');
+	$('button.push').prop('disabled', false);
+}
+
+function addDialogText(text) {
+  var li = $('<li>').text(text);
+  $('#messages').append(li);
+  $('#messageDialog').clearQueue().animate({
+    scrollTop: li.offset().top
+  });
 }
 
