@@ -59,5 +59,10 @@ class ConfigManager extends EventEmitter
 
   getContext: -> @config
 
+  # Updates .balihoo-creative.json with the new form ID returned from Form Builder
+  setCreativeFormId: (formid) ->
+    @config.creativeFormId = formid
+    fs.writeFileSync @configPath, JSON.stringify(@config, null, '  ')
+
 module.exports = (configPath) -> new ConfigManager configPath
 

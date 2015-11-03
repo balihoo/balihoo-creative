@@ -65,6 +65,20 @@ class SampleManager extends EventEmitter
 
   getSample: (key) -> @samples[key]
 
+  getSampleTemplate: (key) ->
+    newData = {}
+    for i, j of @samples[key]
+      # exclude BLIP document top level
+      if i is 'document'
+        newData[i] = j
+      # exclude BLIP document items
+      else if i in ['name', 'phone', 'email', 'address1', 'address2',
+                    'city', 'state', 'zip', 'country', 'website']
+        newData[i] = ''
+      else
+        newData[i + "Template"] = j
+    newData
+
   getSamples: -> @samples
 
 module.exports = SampleManager

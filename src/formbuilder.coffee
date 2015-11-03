@@ -49,12 +49,88 @@ class FormBuilder extends EventEmitter
       .error (reason) ->
         reject "Upload of static assets failed because: #{reason}"
 
+  getFormVersion: (creativeFormId) ->
+    new Promise (resolve, reject) =>
+        dam.getForm creativeFormId, null, (err, incomingMessage, response) =>
+          if (err)
+            reject err
+          else
+            formData = JSON.parse(incomingMessage.body)
+            formVersion = formData.versions[0].version
+            resolve formVersion
+
+  getUpdatedDate: (creativeFormId, formVersion) ->
+    new Promise (resolve, reject) =>
+      dam.getForm creativeFormId, formVersion, (err, incomingMessage, response) =>
+        if (err)
+          reject err
+        else
+          formData = JSON.parse(incomingMessage.body)
+          updatedDate = formData.versions[0].updated
+          resolve updatedDate
+
+  getStatus: (creativeFormId) ->
+    new Promise (resolve, reject) =>
+      dam.getForm creativeFormId, null, (err, incomingMessage, response) =>
+        if (err)
+          reject err
+        else
+          formData = JSON.parse(incomingMessage.body)
+          formStatus = formData.versions[0].status
+          resolve formStatus
+
+  saveNewForm: (creativeFormId, urls) ->
+    @emit 'progress', "Form #{creativeFormId} does not exist."
+    @emit 'progress', 'Creating new form...'
+    creativeForm = @generateForm urls
+    dam.newForm creativeForm, (err, incomingMessage, response) =>
+      creativeFormId = incomingMessage.body.formid
+      @getUpdatedDate(creativeFormId, 1).then (updatedDate) =>
+        creativeForm = @generateForm urls, updatedDate
+        dam.publishForm creativeFormId, creativeForm, (err, incomingMessage, response) =>
+          if err
+            @emit 'progress', 'Failed to save new creative form:'
+            @emit 'progress', err
+            console.log "ERROR", err
+          else
+            @emit 'progress', 'Saved new creative form.'
+            @emit 'progress', '***Form ID: ' + creativeFormId + '***'
+            @config.setCreativeFormId creativeFormId
+            @emit 'complete'
+
+  saveNewDraft: (creativeFormId, urls) ->
+    @getFormVersion(creativeFormId).then (formVersion) =>
+      @getUpdatedDate(creativeFormId, formVersion).then (updatedDate) =>
+        creativeForm = @generateForm urls, updatedDate
+        dam.newDraft creativeFormId, creativeForm, (err, incomingMessage, response) =>
+          if err
+            @emit 'progress', 'Failed to save creative form:'
+            @emit 'progress', err
+            console.log "ERROR", err
+          else
+            @emit 'progress', 'Saved creative form.'
+            @emit 'progress', '***Form ID: ' + creativeFormId + '***'
+            @emit 'complete'
+
+  saveExistingDraft: (creativeFormId, urls) ->
+    @getFormVersion(creativeFormId).then (formVersion) =>
+      @getUpdatedDate(creativeFormId, formVersion).then (updatedDate) =>
+        creativeForm = @generateForm urls, updatedDate
+        dam.saveForm creativeFormId, formVersion, creativeForm, (err, incomingMessage, response) =>
+          if err
+            @emit 'progress', 'Failed to save creative form:'
+            @emit 'progress', err
+            console.log "ERROR", err
+          else
+            @emit 'progress', 'Saved creative form.'
+            @emit 'progress', '***Form ID: ' + creativeFormId + '***'
+            @emit 'complete'
+
   push: ->
     @emit 'progress', "Starting the push process"
 
     @uploadAssets().then (urls) =>
       @emit 'progress', 'Done uploading static assets.'
-      creativeForm = @generateForm urls
       @emit 'progress', 'Saving creative form...'
       creativeFormId = @config.getContext().creativeFormId
       companionFormId = @config.getContext().companionFormId
@@ -66,32 +142,19 @@ class FormBuilder extends EventEmitter
         @emit 'progress', "***"
 
       if creativeFormId is 0
-        @emit 'progress', "Form #{creativeFormId} does not exist."
-        @emit 'progress', 'Creating new form...'
-        dam.newForm creativeForm, (err, incomingMessage, response) =>
-          if err
-            @emit 'progress', 'Failed to save new creative form:'
-            @emit 'progress', err
-            console.log "ERROR", err
-          else
-            @emit 'progress', 'Saved new creative form.'
-            @emit 'progress', '***Form ID: ' + incomingMessage.body.formid + '***'
-            @emit 'complete'
+        @saveNewForm(creativeFormId, urls)
       else
-        dam.saveForm creativeFormId, creativeForm, (err, incomingMessage, response) =>
-          if err
-            @emit 'progress', 'Failed to save creative form:'
-            @emit 'progress', err
-            console.log "ERROR", err
+        @getStatus(creativeFormId).then (formStatus) =>
+          if formStatus == 'Published'
+            @saveNewDraft(creativeFormId, urls)
           else
-            @emit 'progress', 'Saved creative form.'
-            @emit 'progress', '***Form ID: ' + creativeFormId + '***'
-            @emit 'complete'
+            @saveExistingDraft(creativeFormId, urls)
+
     .error (reason) =>
       @emit 'progress', reason
       @emit 'complete'
 
-  generateForm: (urls) ->
+  generateForm: (urls, updated = '') ->
     config = @config.getContext()
     if config.companionFormId isnt 0
       imports = [
@@ -108,7 +171,7 @@ class FormBuilder extends EventEmitter
         page: 'index'
         ifpage:
           index: true
-    , @samples.getSample 'default'
+    , @samples.getSampleTemplate 'default'
 
     name: config.name
     channel: config.channel
@@ -120,7 +183,21 @@ class FormBuilder extends EventEmitter
     layout: @assets.getPartial @config.getTemplate()
     listsource: null
     model: """imports.companion.inject root
-    
+
+    rdr = (template) ->
+      try
+        Mustache.render template, document: document.value
+      catch
+        template
+
+    # Build hidden fields that are calculated based on data values
+    root.children.forEach (child) ->
+      newChild = child.name.replace('Template', '')
+      field newChild, visible: false, dynamicValue: ->
+        rdr(@parent.child(child.name).value)
+
+    document = field 'document', visible: no
+
     field 'request', visible: no
 
     field 'assets', visible: no, value: #{@toCoffeeString @assets.getAssets(), urls}
@@ -128,6 +205,7 @@ class FormBuilder extends EventEmitter
     partials: _.omit @assets.getPartials(), @config.getTemplate()
     preview: null
     testdata: JSON.stringify testData, null, '  '
+    updated: updated
 
   # Turn object to coffee - does not properly support arrays
   toCoffeeString: (obj, urls, tabs = '  ') ->
