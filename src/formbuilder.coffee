@@ -80,23 +80,19 @@ class FormBuilder extends EventEmitter
           resolve formStatus
 
   saveNewForm: (creativeFormId, urls) ->
-    @emit 'progress', "Form #{creativeFormId} does not exist."
     @emit 'progress', 'Creating new form...'
     creativeForm = @generateForm urls
     dam.newForm creativeForm, (err, incomingMessage, response) =>
       creativeFormId = incomingMessage.body.formid
-      @getUpdatedDate(creativeFormId, 1).then (updatedDate) =>
-        creativeForm = @generateForm urls, updatedDate
-        dam.publishForm creativeFormId, creativeForm, (err, incomingMessage, response) =>
-          if err
-            @emit 'progress', 'Failed to save new creative form:'
-            @emit 'progress', err
-            console.log "ERROR", err
-          else
-            @emit 'progress', 'Saved new creative form.'
-            @emit 'progress', '***Form ID: ' + creativeFormId + '***'
-            @config.setCreativeFormId creativeFormId
-            @emit 'complete'
+      if err
+        @emit 'progress', 'Failed to save new creative form:'
+        @emit 'progress', err
+        console.log "ERROR", err
+      else
+        @emit 'progress', 'Saved new creative form.'
+        @emit 'progress', '***Form ID: ' + creativeFormId + '***'
+        @config.setCreativeFormId creativeFormId
+        @emit 'complete'
 
   saveNewDraft: (creativeFormId, urls) ->
     @getFormVersion(creativeFormId).then (formVersion) =>
