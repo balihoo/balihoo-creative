@@ -72,7 +72,7 @@ class SampleManager extends EventEmitter
       if i is 'document'
         newData[i] = j
       # exclude BLIP document items
-      else if i in ['name', 'phone', 'email', 'address1', 'address2',
+      else if i in ['name', 'title', 'phone', 'cell', 'fax', 'email', 'address1', 'address2',
                     'city', 'state', 'zip', 'country', 'website']
         newData[i] = ''
       else

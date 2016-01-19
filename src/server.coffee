@@ -46,17 +46,17 @@ exports.start = (options) =>
       msg.warn "Unable to find default sample data file " + "samples/default.json".yellow
 
     # Then try to inject the selected sample data (based on __sample querystring param)
-    selectedSample = if context.request.q?.__sample then context.request.q.__sample else 'default'
+    selectedSample = if context.urlParts.q?.__sample then context.urlParts.q.__sample else 'default'
     if selectedSample isnt 'default'
       if @samples.hasSample selectedSample
         merge @samples.getSample(selectedSample), context
-      else if not context.request.q?.__sample
+      else if not context.urlParts.q?.__sample
         msg.debug "No sample file requested"
       else
-        msg.warn "Request for unknown sample file #{context.request.q.__sample.yellow}"
+        msg.warn "Request for unknown sample file #{context.urlParts.q.__sample.yellow}"
 
     # Add $tests to the context to inject tests in the page
-    if context.request.q.__notests?
+    if context.urlParts.q.__notests?
       msg.debug "Skipping tests"
     else
       msg.debug "Injecting tests as $tests"
@@ -81,24 +81,24 @@ exports.start = (options) =>
   instance = http.createServer (req, res) =>
     msg.debug "Handling request #{req.url.yellow}"
     context =
-      request: parser.parse req.url
+      urlParts: parser.parse req.url
       assets: @assets.getAssets()
 
     ### Web Server Responses ###
 
     # 1) If this is one of our configured pages, serve it up
-    if @config.hasPage context.request.page
-      renderPage req, res, context, context.request.page
+    if @config.hasPage context.urlParts.page
+      renderPage req, res, context, context.urlParts.page
     # 2) _ is a special page that indicates static content
-    else if context.request.ifpage._? && @assets.hasStaticFile(context.request.path)
-      msg.debug "Rendering static content for #{context.request.path.yellow}"
-      staticFile = @assets.getStaticFile(context.request.path)
+    else if context.urlParts.ifpage._? && @assets.hasStaticFile(context.urlParts.path)
+      msg.debug "Rendering static content for #{context.urlParts.path.yellow}"
+      staticFile = @assets.getStaticFile(context.urlParts.path)
       res.writeHead 200, 'Content-Type': mime.lookup staticFile.path
       res.end staticFile.data
     # 3) Can't find the requested content
     else if @config.hasPage 'notfound'
       msg.warn "Requested content not found #{req.url.yellow}"
-      context.request.ifpage = {notfound: true}
+      context.urlParts.ifpage = {notfound: true}
       renderPage req, res, context, 'notfound'
     else
       res.writeHead 404, 'Content-Type': 'text/html'

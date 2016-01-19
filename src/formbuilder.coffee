@@ -161,7 +161,7 @@ class FormBuilder extends EventEmitter
       imports = []
 
     testData = _.extend
-      request:
+      urlParts:
         q: {}
         path: '/index/'
         page: 'index'
@@ -194,7 +194,7 @@ class FormBuilder extends EventEmitter
 
     document = field 'document', visible: no
 
-    field 'request', visible: no
+    field 'urlParts', visible: no
 
     field 'assets', visible: no, value: #{@toCoffeeString @assets.getAssets(), urls}
     """
