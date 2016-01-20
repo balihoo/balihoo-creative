@@ -5,14 +5,14 @@
   {{&gt; navbar}}
 
   &lt;!-- Page layout --&gt;
-  {{#request}}
+  {{#urlParts}}
     {{#ifpage.index}}      {{&gt; index}}      {{/ifpage.index}}
     {{#ifpage.assets}}     {{&gt; assets}}     {{/ifpage.assets}}
     {{#ifpage.sampledata}} {{&gt; sampledata}} {{/ifpage.sampledata}}
     {{#ifpage.test}}       {{&gt; test}}       {{/ifpage.test}}
     {{#ifpage.config}}     {{&gt; config}}     {{/ifpage.config}}
     {{#ifpage.notfound}}   {{&gt; notfound}}   {{/ifpage.notfound}}
-  {{/request}}
+  {{/urlParts}}
 
   &lt;!-- Footer --&gt;
   {{&gt; footer}}
