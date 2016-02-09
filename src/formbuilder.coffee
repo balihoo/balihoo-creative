@@ -167,11 +167,11 @@ class FormBuilder extends EventEmitter
         page: 'index'
         ifpage:
           index: true
-    , @samples.getSampleTemplate 'default'
+    , @samples.getSample 'default'
 
     name: config.name
     channel: config.channel
-    brands: ['demo']
+    brands: config.brands
     type: 'Creative'
     description: config.description
     endpoint: config.endpoint
@@ -180,19 +180,7 @@ class FormBuilder extends EventEmitter
     listsource: null
     model: """imports.companion.inject root
 
-    rdr = (template) ->
-      try
-        Mustache.render template, document: document.value
-      catch
-        template
-
-    # Build hidden fields that are calculated based on data values
-    root.children.forEach (child) ->
-      newChild = child.name.replace('Template', '')
-      field newChild, visible: false, dynamicValue: ->
-        rdr(@parent.child(child.name).value)
-
-    document = field 'document', visible: no
+    field 'document', visible: no
 
     field 'urlParts', visible: no
 

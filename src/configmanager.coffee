@@ -33,6 +33,7 @@ class ConfigManager extends EventEmitter
         name: projectName
         description: ''
         channel: 'Local Websites'
+        brands: []
         creativeFormId: 0
         companionFormId: 0
         endpoint: 0
