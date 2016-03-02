@@ -182,6 +182,10 @@ class FormBuilder extends EventEmitter
 
     field 'document', visible: no
 
+    field 'tacticId', visible: no
+
+    field 'locationKey', visible: no
+
     field 'urlParts', visible: no
 
     field 'assets', visible: no, value: #{@toCoffeeString @assets.getAssets(), urls}
