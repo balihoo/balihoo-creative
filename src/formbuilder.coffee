@@ -1,6 +1,7 @@
 
 Promise   = require 'bluebird'
 dam       = require 'balihoo-dam-client'
+fbconfig  = require '../config'
 colors    = require 'colors'
 _         = require 'underscore'
 {EventEmitter}  = require 'events'
@@ -13,14 +14,16 @@ class FormBuilder extends EventEmitter
   constructor: (options = {}) ->
     msg.debug "Instantiating FormBuilder"
     @assets = options.assets || throw "FormBuilder requires assets"
-    @config = options.config || throw "FormBuilder requres config"
-    @samples= options.samples|| throw "FormBuilder requres samples"
+    @config = options.config || throw "FormBuilder requires config"
+    @samples = options.samples|| throw "FormBuilder requires samples"
 
-    dam.config
-      formbuilder:
-        url: 'https://fb.dev.balihoo-cloud.com'
-        username: 'username'
-        password: 'password'
+#    dam.config
+#      formbuilder:
+#        url: 'https://fb.dev.balihoo-cloud.com'
+#        username: 'username'
+#        password: 'password'
+
+    dam.config fbconfig
 
   uploadAssets: ->
     urls = {}

@@ -1,0 +1,7 @@
+{
+    "formbuilder": {
+        "url": "[% fb.dev.url %]",
+        "username": "[% fb.dev.username %]",
+        "password": "[% fb.dev.password %]"
+    }
+}

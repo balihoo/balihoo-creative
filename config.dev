@@ -1,0 +1,18 @@
+# ##########################
+# Top Global Vars
+# ##########################
+env=dev
+
+# ##########################
+# Please keep this file in
+# alphabetical order below this mark
+# by the service namespace
+# ##########################
+
+##########################
+# Formbuilder
+##########################
+fb.dev.url=https://fb.dev.balihoo-cloud.com
+fb.dev.username=username
+fb.dev.password=password
+

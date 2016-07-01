@@ -3,3 +3,7 @@ lib/
 .*.swp
 .idea
 .log
+/balihoo.config.local
+/config.prod
+/config.stage
+/config.dev
