@@ -1,6 +1,6 @@
 {
     "formbuilder": {
-        "url": "https://fb.dev.balihoo-cloud.com",
+        "url": "https://fb.#{env}.balihoo-cloud.com",
         "username": "username",
         "password": "password"
     }

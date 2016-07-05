@@ -112,6 +112,14 @@ class Console extends EventEmitter
     server.on 'request', (req, res) =>
       request = parser.parse req.url
 
+      body = []
+      req.on 'data', (data) =>
+        console.log data
+        body.push data
+      .on 'end', =>
+         body = Buffer.concat(body).toString()
+         console.log body
+
       # If the $console page is requested then serve it up
       if request.page is @options.path && not is_es req
         if request?.ifstatic

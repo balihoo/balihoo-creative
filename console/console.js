@@ -191,9 +191,9 @@ function testsDone(details) {
 }
 
 // Try to push this creative template to the form-builder service
-function pushCreative() {
+function pushCreative(env) {
 	$('button.push').prop('disabled', true);
-  $.post('/$push', function() {});
+  $.post('/$push', { env: env} , function() {});
 }
 
 function openDialog(title) {

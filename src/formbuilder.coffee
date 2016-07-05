@@ -23,6 +23,9 @@ class FormBuilder extends EventEmitter
 #        username: 'username'
 #        password: 'password'
 
+    env = 'dev'
+    fbconfig.formbuilder.url = "https://fb.#{env}.balihoo-cloud.com"
+    console.log fbconfig.formbuilder.url
     dam.config fbconfig
 
   uploadAssets: ->
