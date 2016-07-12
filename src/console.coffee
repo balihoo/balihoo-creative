@@ -112,14 +112,6 @@ class Console extends EventEmitter
     server.on 'request', (req, res) =>
       request = parser.parse req.url
 
-      body = []
-      req.on 'data', (data) =>
-        console.log data
-        body.push data
-      .on 'end', =>
-         body = Buffer.concat(body).toString()
-         console.log body
-
       # If the $console page is requested then serve it up
       if request.page is @options.path && not is_es req
         if request?.ifstatic
@@ -146,7 +138,13 @@ class Console extends EventEmitter
             res.end @content[@indexPage].content
       # If the requested page is "push" then push the form to form builder
       else if request.page is '$push' && not is_es req
-        @initiateFormPush()
+        body = []
+        req.on 'data', (data) =>
+          body.push data
+        .on 'end', =>
+          body = Buffer.concat(body).toString()
+          environment = body.replace 'env=', ''
+          @initiateFormPush environment
         res.end "Push request recieved"
       else # fall back to server's default request handlers
         msg.debug "Forwarding request for #{req.url.yellow}"
@@ -183,9 +181,9 @@ class Console extends EventEmitter
     @timer = setTimeout @handleRefresh, 400
     msg.debug "Queued refresh request ##{@refreshCount}"
 
-  initiateFormPush: =>
+  initiateFormPush: (env) =>
     @send 'opendialog', 'Form Push In Progress...'
-    @options.formbuilder.push()
+    @options.formbuilder.push(env)
 
 module.exports = (options) -> new Console options
 

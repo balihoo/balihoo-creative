@@ -23,10 +23,10 @@ class FormBuilder extends EventEmitter
 #        username: 'username'
 #        password: 'password'
 
-    env = 'dev'
-    fbconfig.formbuilder.url = "https://fb.#{env}.balihoo-cloud.com"
-    console.log fbconfig.formbuilder.url
-    dam.config fbconfig
+#    env = 'dev'
+#    fbconfig.formbuilder.url = "https://fb.#{env}.balihoo-cloud.com"
+#    console.log fbconfig.formbuilder.url
+#    dam.config fbconfig
 
   uploadAssets: ->
     urls = {}
@@ -128,8 +128,10 @@ class FormBuilder extends EventEmitter
             @emit 'progress', '***Form ID: ' + creativeFormId + '***'
             @emit 'complete'
 
-  push: ->
+  push: (env) ->
     @emit 'progress', "Starting the push process"
+    fbconfig.formbuilder.url = "https://fb.#{env}.balihoo-cloud.com"
+    dam.config fbconfig
 
     @uploadAssets().then (urls) =>
       @emit 'progress', 'Done uploading static assets.'
