@@ -130,7 +130,11 @@ class FormBuilder extends EventEmitter
 
   push: (env) ->
     @emit 'progress', "Starting the push process"
-    fbconfig.formbuilder.url = "https://fb.#{env}.balihoo-cloud.com"
+    console.log env
+    if env is 'dev' or env is 'stage'
+      fbconfig.formbuilder.url = "https://fb.#{env}.balihoo-cloud.com"
+    else
+      fbconfig.formbuilder.url = "https://fb.balihoo-cloud.com"
     dam.config fbconfig
 
     @uploadAssets().then (urls) =>
