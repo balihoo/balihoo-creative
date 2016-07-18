@@ -145,7 +145,7 @@ class Console extends EventEmitter
           body = Buffer.concat(body).toString()
           environment = body.replace 'env=', ''
           @initiateFormPush environment
-        res.end "Push request recieved"
+        res.end "Push request received"
       else # fall back to server's default request handlers
         msg.debug "Forwarding request for #{req.url.yellow}"
         l.call server, req, res for l in listeners

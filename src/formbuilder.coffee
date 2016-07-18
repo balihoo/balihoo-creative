@@ -130,7 +130,6 @@ class FormBuilder extends EventEmitter
 
   push: (env) ->
     @emit 'progress', "Starting the push process"
-    console.log env
     if env is 'dev' or env is 'stage'
       fbconfig.formbuilder.url = "https://fb.#{env}.balihoo-cloud.com"
     else
@@ -140,8 +139,16 @@ class FormBuilder extends EventEmitter
     @uploadAssets().then (urls) =>
       @emit 'progress', 'Done uploading static assets.'
       @emit 'progress', 'Saving creative form...'
-      creativeFormId = @config.getContext().creativeFormId
-      companionFormId = @config.getContext().companionFormId
+      switch env
+        when 'dev'
+          creativeFormId = @config.getContext().environments.dev.creativeFormId
+          companionFormId = @config.getContext().environments.dev.companionFormId
+        when 'stage'
+          creativeFormId = @config.getContext().environments.stage.creativeFormId
+          companionFormId = @config.getContext().environments.stage.companionFormId
+        when 'prod'
+          creativeFormId = @config.getContext().environments.prod.creativeFormId
+          companionFormId = @config.getContext().environments.prod.companionFormId
 
       if companionFormId is 0
         @emit 'progress', "***"
@@ -150,13 +157,13 @@ class FormBuilder extends EventEmitter
         @emit 'progress', "***"
 
       if creativeFormId is 0
-        @saveNewForm(creativeFormId, urls)
+        @saveNewForm(creativeFormId, urls, env)
       else
         @getStatus(creativeFormId).then (formStatus) =>
           if formStatus == 'Published'
-            @saveNewDraft(creativeFormId, urls)
+            @saveNewDraft(creativeFormId, urls, env)
           else
-            @saveExistingDraft(creativeFormId, urls)
+            @saveExistingDraft(creativeFormId, urls, env)
 
     .error (reason) =>
       @emit 'progress', reason
@@ -166,7 +173,7 @@ class FormBuilder extends EventEmitter
     config = @config.getContext()
     if config.companionFormId isnt 0
       imports = [
-        importformid: config.companionFormId
+        importformid: config.environments.dev.companionFormId
         namespace: 'companion'
       ]
     else
@@ -186,7 +193,7 @@ class FormBuilder extends EventEmitter
     brands: config.brands
     type: 'Creative'
     description: config.description
-    endpoint: config.endpoint
+    endpoint: config.environments.dev.endpoint
     imports: imports
     layout: @assets.getPartial @config.getTemplate()
     listsource: null
