@@ -17,11 +17,11 @@ class FormBuilder extends EventEmitter
     @config = options.config || throw "FormBuilder requires config"
     @samples = options.samples|| throw "FormBuilder requires samples"
 
-#    dam.config
-#      formbuilder:
-#        url: 'https://fb.dev.balihoo-cloud.com'
-#        username: 'username'
-#        password: 'password'
+    dam.config
+      formbuilder:
+        url: 'https://fb.dev.balihoo-cloud.com'
+        username: 'username'
+        password: 'password'
 
 #    env = 'dev'
 #    fbconfig.formbuilder.url = "https://fb.#{env}.balihoo-cloud.com"
@@ -130,25 +130,20 @@ class FormBuilder extends EventEmitter
 
   push: (env) ->
     @emit 'progress', "Starting the push process"
-    if env is 'dev' or env is 'stage'
-      fbconfig.formbuilder.url = "https://fb.#{env}.balihoo-cloud.com"
-    else
-      fbconfig.formbuilder.url = "https://fb.balihoo-cloud.com"
-    dam.config fbconfig
+#    if env is 'dev' or env is 'stage'
+#    fbconfig.formbuilder.url = "https://fb.#{env}.balihoo-cloud.com"
+#    else
+#      fbconfig.formbuilder.url = "https://fb.balihoo-cloud.com"
+#    fbconfig.formbuilder.environments[env].url = @config.getContext().environments[env].url
+#    console.log fbconfig.formbuilder.environments[env].url
+#    dam.config fbconfig
 
     @uploadAssets().then (urls) =>
       @emit 'progress', 'Done uploading static assets.'
       @emit 'progress', 'Saving creative form...'
-      switch env
-        when 'dev'
-          creativeFormId = @config.getContext().environments.dev.creativeFormId
-          companionFormId = @config.getContext().environments.dev.companionFormId
-        when 'stage'
-          creativeFormId = @config.getContext().environments.stage.creativeFormId
-          companionFormId = @config.getContext().environments.stage.companionFormId
-        when 'prod'
-          creativeFormId = @config.getContext().environments.prod.creativeFormId
-          companionFormId = @config.getContext().environments.prod.companionFormId
+
+      creativeFormId = @config.getContext().environments[env].creativeFormId
+      companionFormId = @config.getContext().environments[env].companionFormId
 
       if companionFormId is 0
         @emit 'progress', "***"

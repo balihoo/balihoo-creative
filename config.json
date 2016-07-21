@@ -1,7 +1,21 @@
 {
     "formbuilder": {
-        "url": "https://fb.#{env}.balihoo-cloud.com",
-        "username": "username",
-        "password": "password"
+        "environments": {
+            "dev": {
+                "url": "https://fb.dev.balihoo-cloud.com",
+                "username": "username",
+                "password": "password"
+            },
+            "stage": {
+                "url": "https://fb.stage.balihoo-cloud.com",
+                "username": "username",
+                "password": "password"
+            },
+            "prod": {
+                "url": "https://fb.balihoo-cloud.com",
+                "username": "username",
+                "password": "password"
+            }
+        }
     }
 }
