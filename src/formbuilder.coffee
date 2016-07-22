@@ -17,17 +17,6 @@ class FormBuilder extends EventEmitter
     @config = options.config || throw "FormBuilder requires config"
     @samples = options.samples|| throw "FormBuilder requires samples"
 
-#    dam.config
-#      formbuilder:
-#        url: 'https://fb.dev.balihoo-cloud.com'
-#        username: 'username'
-#        password: 'password'
-
-#    env = 'dev'
-#    fbconfig.formbuilder.url = "https://fb.#{env}.balihoo-cloud.com"
-#    console.log fbconfig.formbuilder.url
-#    dam.config fbconfig
-
   uploadAssets: ->
     urls = {}
     uploadFile = Promise.promisify (asset, path, cb) =>
@@ -101,7 +90,6 @@ class FormBuilder extends EventEmitter
         @emit 'complete'
 
   saveNewDraft: (creativeFormId, urls) ->
-    console.log 'New Draft: ' + creativeFormId
     @getFormVersion(creativeFormId).then (formVersion) =>
       @getUpdatedDate(creativeFormId, formVersion).then (updatedDate) =>
         creativeForm = @generateForm urls, updatedDate
@@ -116,7 +104,6 @@ class FormBuilder extends EventEmitter
             @emit 'complete'
 
   saveExistingDraft: (creativeFormId, urls) ->
-    console.log 'Existing Draft: ' + creativeFormId
     @getFormVersion(creativeFormId).then (formVersion) =>
       @getUpdatedDate(creativeFormId, formVersion).then (updatedDate) =>
         creativeForm = @generateForm urls, updatedDate
@@ -143,11 +130,8 @@ class FormBuilder extends EventEmitter
       @emit 'progress', 'Done uploading static assets.'
       @emit 'progress', 'Saving creative form...'
 
-      console.log env
       creativeFormId = @config.getContext().environments[env].creativeFormId
-      console.log creativeFormId
       companionFormId = @config.getContext().environments[env].companionFormId
-      console.log companionFormId
 
       if companionFormId is 0
         @emit 'progress', "***"
