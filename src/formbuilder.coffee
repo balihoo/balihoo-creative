@@ -17,11 +17,11 @@ class FormBuilder extends EventEmitter
     @config = options.config || throw "FormBuilder requires config"
     @samples = options.samples|| throw "FormBuilder requires samples"
 
-    dam.config
-      formbuilder:
-        url: 'https://fb.dev.balihoo-cloud.com'
-        username: 'username'
-        password: 'password'
+#    dam.config
+#      formbuilder:
+#        url: 'https://fb.dev.balihoo-cloud.com'
+#        username: 'username'
+#        password: 'password'
 
 #    env = 'dev'
 #    fbconfig.formbuilder.url = "https://fb.#{env}.balihoo-cloud.com"
@@ -101,6 +101,7 @@ class FormBuilder extends EventEmitter
         @emit 'complete'
 
   saveNewDraft: (creativeFormId, urls) ->
+    console.log 'New Draft: ' + creativeFormId
     @getFormVersion(creativeFormId).then (formVersion) =>
       @getUpdatedDate(creativeFormId, formVersion).then (updatedDate) =>
         creativeForm = @generateForm urls, updatedDate
@@ -115,6 +116,7 @@ class FormBuilder extends EventEmitter
             @emit 'complete'
 
   saveExistingDraft: (creativeFormId, urls) ->
+    console.log 'Existing Draft: ' + creativeFormId
     @getFormVersion(creativeFormId).then (formVersion) =>
       @getUpdatedDate(creativeFormId, formVersion).then (updatedDate) =>
         creativeForm = @generateForm urls, updatedDate
@@ -129,21 +131,23 @@ class FormBuilder extends EventEmitter
             @emit 'complete'
 
   push: (env) ->
+    global.env = env
     @emit 'progress', "Starting the push process"
-#    if env is 'dev' or env is 'stage'
-#    fbconfig.formbuilder.url = "https://fb.#{env}.balihoo-cloud.com"
-#    else
-#      fbconfig.formbuilder.url = "https://fb.balihoo-cloud.com"
-#    fbconfig.formbuilder.environments[env].url = @config.getContext().environments[env].url
-#    console.log fbconfig.formbuilder.environments[env].url
-#    dam.config fbconfig
+    dam.config
+      formbuilder:
+        url: fbconfig.formbuilder.environments[env].url
+        username: fbconfig.formbuilder.environments[env].username
+        password: fbconfig.formbuilder.environments[env].password
 
     @uploadAssets().then (urls) =>
       @emit 'progress', 'Done uploading static assets.'
       @emit 'progress', 'Saving creative form...'
 
+      console.log env
       creativeFormId = @config.getContext().environments[env].creativeFormId
+      console.log creativeFormId
       companionFormId = @config.getContext().environments[env].companionFormId
+      console.log companionFormId
 
       if companionFormId is 0
         @emit 'progress', "***"
@@ -168,7 +172,7 @@ class FormBuilder extends EventEmitter
     config = @config.getContext()
     if config.companionFormId isnt 0
       imports = [
-        importformid: config.environments.dev.companionFormId
+        importformid: config.environments[global.env].companionFormId
         namespace: 'companion'
       ]
     else
@@ -188,7 +192,7 @@ class FormBuilder extends EventEmitter
     brands: config.brands
     type: 'Creative'
     description: config.description
-    endpoint: config.environments.dev.endpoint
+    endpoint: config.environments[global.env].endpoint
     imports: imports
     layout: @assets.getPartial @config.getTemplate()
     listsource: null

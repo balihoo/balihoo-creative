@@ -13,8 +13,8 @@
             },
             "prod": {
                 "url": "https://fb.balihoo-cloud.com",
-                "username": "username",
-                "password": "password"
+                "username": "bacula",
+                "password": "scott"
             }
         }
     }
