@@ -54,7 +54,15 @@
     <script>
         $('.push').click(function() {
             var environment = $('.environment').val();
-            pushCreative(environment);
+            if (environment == 'prod') {
+                var pushToProd  = confirm('Do you want to publish this creative to production?');
+                if (pushToProd == true) {
+                    pushCreative(environment);
+                }
+            }
+            else {
+                pushCreative(environment);
+            }
         });
     </script>
 </html>
