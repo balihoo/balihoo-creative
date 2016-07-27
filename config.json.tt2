@@ -1,7 +1,20 @@
 {
     "formbuilder": {
-        "url": "[% fb.dev.url %]",
-        "username": "[% fb.dev.username %]",
-        "password": "[% fb.dev.password %]"
+        "environments": {
+            "dev": {
+                "url": "[% fb.dev.url %]",
+                "username": "[% fb.dev.username %]",
+                "password": "[% fb.dev.password %]"
+            },
+            "stage": {
+                "url": "[% fb.stage.url %]",
+                "username": "[% fb.stage.username %]",
+                "password": "[% fb.stage.password %]"
+            },
+            "prod": {
+                "url": "[% fb.prod.url %]",
+                "username": "[% fb.prod.username %]",
+                "password": "[% fb.prod.password %]"
+            }
     }
 }
