@@ -144,9 +144,9 @@ class FormBuilder extends EventEmitter
       else
         @getStatus(creativeFormId).then (formStatus) =>
           if formStatus == 'Published'
-            @saveNewDraft(creativeFormId, urls, env)
+            @saveNewDraft(creativeFormId, urls)
           else
-            @saveExistingDraft(creativeFormId, urls, env)
+            @saveExistingDraft(creativeFormId, urls)
 
     .error (reason) =>
       @emit 'progress', reason
