@@ -140,7 +140,7 @@ class FormBuilder extends EventEmitter
         @emit 'progress', "***"
 
       if creativeFormId is 0
-        @saveNewForm(creativeFormId, urls, env)
+        @saveNewForm(creativeFormId, urls)
       else
         @getStatus(creativeFormId).then (formStatus) =>
           if formStatus == 'Published'
