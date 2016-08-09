@@ -145,6 +145,8 @@ class Console extends EventEmitter
           body = Buffer.concat(body).toString()
           environment = body.replace 'env=', ''
           @initiateFormPush environment
+        .on 'error', (error) =>
+          msg.error "Failed to push the form to Form Builder: #{error.message}"
         res.end "Push request received"
       else # fall back to server's default request handlers
         msg.debug "Forwarding request for #{req.url.yellow}"
