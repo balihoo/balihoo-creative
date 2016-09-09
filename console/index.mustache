@@ -29,7 +29,12 @@
           <span id="testResults">...</span>
         </div>
         <div class="pane">
-          <button class="push" onclick="pushCreative();">Push Creative</button>
+          <button class="push">Push Creative</button>
+          <select class="environment">
+              <option value="dev">Development</option>
+              <option value="stage">Stage</option>
+              <option value="prod">Production</option>
+          </select>
         </div>
       </div>
     </div>
@@ -45,5 +50,20 @@
     </div>
 
    </body>
+
+    <script>
+        $('.push').click(function() {
+            var environment = $('.environment').val();
+            if (environment == 'prod') {
+                var pushToProd  = confirm('Do you want to publish this creative to production?');
+                if (pushToProd == true) {
+                    pushCreative(environment);
+                }
+            }
+            else {
+                pushCreative(environment);
+            }
+        });
+    </script>
 </html>
 

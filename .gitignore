@@ -3,3 +3,4 @@ lib/
 .*.swp
 .idea
 .log
+config.json

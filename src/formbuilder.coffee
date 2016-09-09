@@ -1,6 +1,7 @@
 
 Promise   = require 'bluebird'
 dam       = require 'balihoo-dam-client'
+fbconfig  = require '../config'
 colors    = require 'colors'
 _         = require 'underscore'
 {EventEmitter}  = require 'events'
@@ -13,14 +14,8 @@ class FormBuilder extends EventEmitter
   constructor: (options = {}) ->
     msg.debug "Instantiating FormBuilder"
     @assets = options.assets || throw "FormBuilder requires assets"
-    @config = options.config || throw "FormBuilder requres config"
-    @samples= options.samples|| throw "FormBuilder requres samples"
-
-    dam.config
-      formbuilder:
-        url: 'https://fb.dev.balihoo-cloud.com'
-        username: 'username'
-        password: 'password'
+    @config = options.config || throw "FormBuilder requires config"
+    @samples = options.samples|| throw "FormBuilder requires samples"
 
   uploadAssets: ->
     urls = {}
@@ -122,14 +117,21 @@ class FormBuilder extends EventEmitter
             @emit 'progress', '***Form ID: ' + creativeFormId + '***'
             @emit 'complete'
 
-  push: ->
+  push: (env) ->
+    global.env = env
     @emit 'progress', "Starting the push process"
+    dam.config
+      formbuilder:
+        url: fbconfig.formbuilder.environments[env].url
+        username: fbconfig.formbuilder.environments[env].username
+        password: fbconfig.formbuilder.environments[env].password
 
     @uploadAssets().then (urls) =>
       @emit 'progress', 'Done uploading static assets.'
       @emit 'progress', 'Saving creative form...'
-      creativeFormId = @config.getContext().creativeFormId
-      companionFormId = @config.getContext().companionFormId
+
+      creativeFormId = @config.getContext().environments[env].creativeFormId
+      companionFormId = @config.getContext().environments[env].companionFormId
 
       if companionFormId is 0
         @emit 'progress', "***"
@@ -154,7 +156,7 @@ class FormBuilder extends EventEmitter
     config = @config.getContext()
     if config.companionFormId isnt 0
       imports = [
-        importformid: config.companionFormId
+        importformid: config.environments[global.env].companionFormId
         namespace: 'companion'
       ]
     else
@@ -174,7 +176,7 @@ class FormBuilder extends EventEmitter
     brands: config.brands
     type: 'Creative'
     description: config.description
-    endpoint: config.endpoint
+    endpoint: config.environments[global.env].endpoint
     imports: imports
     layout: @assets.getPartial @config.getTemplate()
     listsource: null
