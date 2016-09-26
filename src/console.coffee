@@ -21,7 +21,7 @@ is_es = (req) ->
   req.method is 'GET' && (!!~accept.indexOf('text/event-stream') || !!~accept.indexOf('text/x-dom-event-stream'))
 
 class Console extends EventEmitter
-  constructor: (@options = path: '$console', config: null) ->
+  constructor: (options = path: '$console', config: null) ->
     @pushing = no
     @options = if typeof options is 'string' then path: options else options
     @content = {}
