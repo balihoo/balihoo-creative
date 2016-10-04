@@ -35,7 +35,7 @@
     "ansi-to-html": "0.3.0",
     "moment": ">= 2.8.4",
     "bluebird": "2.9.24",
-    "balihoo-dam-client": ">= 0.0.3",
+    "balihoo-dam-client": "0.0.3",
     "underscore": ">= 1.8.3"
   },
   "devDependencies": {
