@@ -29,13 +29,13 @@
     "chokidar": "0.12.5",
     "mustache": "1.0.0",
     "mime": "1.2.11",
-    "opn": "1.0.0",
+    "opn": "^4.0.2",
     "sse-stream": "0.0.4",
     "coffee-script": ">= 1.7.1",
     "ansi-to-html": "0.3.0",
     "moment": ">= 2.8.4",
     "bluebird": "2.9.24",
-    "balihoo-dam-client": ">= 0.0.3",
+    "balihoo-dam-client": "0.0.3",
     "underscore": ">= 1.8.3"
   },
   "devDependencies": {

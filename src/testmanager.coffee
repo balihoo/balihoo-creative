@@ -36,7 +36,7 @@ class TestManager extends EventEmitter
         msg.debug "  #{fileName.white}"
         fs.writeFileSync(destPath, fs.readFileSync(srcPath))
 
-   needScan: ->
+  needScan: ->
     if @timer then clearTimeout @timer
     @timer = setTimeout @scan, 200
 

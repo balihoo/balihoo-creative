@@ -1,8 +1,5 @@
 body {
-  position: fixed;
-  overflow: hidden;
-  width: 100%;
-  margin: 0px;
+  margin: 0px auto;
   font-family: "Arial Black";
 }
 .toolbar-wrapper {
@@ -35,9 +32,6 @@ body {
 }
 input {
   max-width: 85%;
-}
-.push {
-  margin-top: 10px;
 }
 .passed {
   margin-left: 10px;

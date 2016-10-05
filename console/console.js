@@ -5,7 +5,7 @@ $(function() {
   var sel = $('#samples');
   var tests = $('#tests');
   var nav = $('#nav');
-  es = new EventSource('/$console')
+  es = new EventSource('/$console');
 
   // If a new url is entered, go there
   nav.keyup(function (e) {
@@ -33,7 +33,6 @@ $(function() {
 
   es.onmessage = function(event) {
     e = JSON.parse(event.data);
-    console.log("Got event " + e.event);
     if(e.event === 'reload') {
       // Reload happens when this script is update
       // Try to remember where we where by storing info in the new querystring
@@ -70,7 +69,7 @@ $(function() {
       // Set the initial path if it isn't already set
       if(frameUrl == 'about:blank' || frameUrl == '') {
         var search = URI(window.location).search(true);
-        var newLocation = search['__url'] ? search['__url'] : '/';
+        var newLocation = search['__url'] || '/';
         iframe.contentWindow.location = newLocation;
         nav.val(newLocation);
       } else {
@@ -84,7 +83,7 @@ $(function() {
     } else if(e.event === 'closedialog') {
       closeDialog();
     }
-  }
+  };
 
   // When the iframe navigates, refresh the UI
   $('#contentFrame').load(function() {
@@ -115,15 +114,24 @@ $(function() {
     nav.val(iframe.contentWindow.location);
   }
 
+  //Gets an object representing the iframe url's search parameters, or empty object if not found
+  function getIFrameSearch() {
+    var search = {};
+    try {
+      search = URI(iframe.contentWindow.location).search(true);
+    } catch (err) {}
+    return search;
+  }
+
   // Repopulate the selected sample based on the iframe's querystring
   function setSelectedSample() {
-    var search = URI(iframe.contentWindow.location).search(true);
-    sel.val(search['__sample'] ? search['__sample'] : 'default');
+    var search = getIFrameSearch();
+    sel.val(search['__sample'] || 'default');
   }
 
   // Repopulate the selected sample based on the iframe's querystring
   function setTestSelection() {
-    var search = URI(iframe.contentWindow.location).search(true);
+    var search = getIFrameSearch();
     var noTests = search.hasOwnProperty('__notests');
     tests.prop('checked', noTests);
     if(noTests)
