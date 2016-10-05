@@ -128,6 +128,6 @@ exports.start = (options) =>
     msg.error message
     throw message
   else
-    host = if addr.address is '0.0.0.0' then 'localhost' else addr.address
+    host = if addr.address in ['0.0.0.0', '::'] then 'localhost' else addr.address
     "http://#{host}:#{addr.port}/$console"
 
