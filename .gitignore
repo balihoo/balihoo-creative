@@ -1,6 +1,7 @@
-node_modules/
 lib/
+node_modules/
 .*.swp
 .idea
 .log
 config.json
+balihoo-creative*.tgz
