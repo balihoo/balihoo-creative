@@ -25,18 +25,21 @@
     "node": ">= 0.10.26"
   },
   "dependencies": {
-    "minimist": "1.1.0",
-    "colors": "1.0.3",
-    "chokidar": "0.12.5",
-    "mustache": "1.0.0",
-    "mime": "1.2.11",
-    "opn": "^4.0.2",
-    "sse-stream": "0.0.4",
-    "coffee-script": ">= 1.7.1",
     "ansi-to-html": "0.3.0",
-    "moment": ">= 2.8.4",
-    "bluebird": "2.9.24",
     "balihoo-dam-client": "0.0.3",
+    "bluebird": "2.9.24",
+    "chokidar": "0.12.5",
+    "clone": "^2.0.0",
+    "coffee-script": ">= 1.7.1",
+    "colors": "1.0.3",
+    "extend": "^3.0.0",
+    "mime": "1.2.11",
+    "minimist": "1.1.0",
+    "moment": ">= 2.8.4",
+    "mustache": "1.0.0",
+    "opn": "^4.0.2",
+    "request": "^2.75.0",
+    "sse-stream": "0.0.4",
     "underscore": ">= 1.8.3"
   },
   "devDependencies": {
@@ -47,5 +50,7 @@
   "bin": {
     "balihoo-creative": "index.js"
   },
-  "keywords": ["balihoo"]
+  "keywords": [
+    "balihoo"
+  ]
 }

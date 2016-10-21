@@ -4,33 +4,37 @@ path      = require 'path'
 colors    = require 'colors'
 chokidar        = require 'chokidar'
 {EventEmitter}  = require 'events'
+clone = require 'clone'
+extend = require 'extend'
+#todo: this is probably NOT the place to store this config file. Also should be optional
+formbuilderConfig  = require('../config').formbuilder
 
 # Set up logging
 Messages  = require './messages'
 msg = new Messages 'CONFIG'
 
 class ConfigManager extends EventEmitter
-  constructor: (@configPath) ->
+  constructor: (@creativeConfigPath) ->
     msg.debug 'Instantiating configmanager'
-    @config = {}
+    @creativeConfig = {}
     @ingoreNextUpdate = false
-    @loadConfig()
-    msg.debug "Watching config file: #{@configPath.yellow}"
-    chokidar.watch(@configPath, {persistent: yes, ignoreInitial: yes, interval: 50}).on 'change', (event, path) =>
+    @loadCreativeConfig()
+    msg.debug "Watching config file: #{@creativeConfigPath.yellow}"
+    chokidar.watch(@creativeConfigPath, {persistent: yes, ignoreInitial: yes, interval: 50}).on 'change', (event, path) =>
       msg.debug 'Config file updated'
       @needReload()
+    @workingDir = path.basename process.cwd()
 
-   needReload: ->
+  needReload: ->
     if @timer then clearTimeout @timer
-    @timer = setTimeout @loadConfig, 200
+    @timer = setTimeout @loadCreativeConfig, 200
 
-  loadConfig: =>
-    if not fs.existsSync @configPath
+  loadCreativeConfig: ->
+    if not fs.existsSync @creativeConfigPath
       # By default, use the current working directory as the project name
-      projectName = path.basename process.cwd()
-      msg.info "Creating config for: #{projectName.yellow}"
-      @config =
-        name: projectName
+      msg.info "Creating config for: #{@workingDir.yellow}"
+      @creativeConfig =
+        name: @workingDir
         description: ''
         channel: 'Local Websites'
         brands: []
@@ -47,33 +51,41 @@ class ConfigManager extends EventEmitter
             creativeFormId: 0
             companionFormId: 0
             endpoint: 0
-        pages: ['index', 'assets', 'urls', 'sampledata', 'test', 'config', 'notfound']
+        pages: ['index', 'assets', 'urls', 'sampledata', 'test', 'config', 'notfound']  #todo: why all these as default?
         template: 'main'
         port: 8088
-      @saveConfig()
+      @saveCreativeConfig()
     else
-      msg.debug "Loading project config file #{@configPath.yellow}"
-      @config = JSON.parse fs.readFileSync(@configPath, encoding:'utf8')
+      msg.debug "Loading project config file #{@creativeConfigPath.yellow}"
+      @creativeConfig = JSON.parse fs.readFileSync(@creativeConfigPath, encoding:'utf8')
     @emit 'update'
 
-  saveConfig: ->
-    msg.debug "Saving config file #{@configPath.yellow}"
-    fs.writeFileSync @configPath, JSON.stringify(@config, null, '  ')
+  saveCreativeConfig: ->
+    msg.debug "Saving config file #{@creativeConfigPath.yellow}"
+    fs.writeFileSync @creativeConfigPath, JSON.stringify(@creativeConfig, null, '  ')
 
-  hasPage: (page) -> page in @config.pages
+  hasPage: (page) -> page in @creativeConfig.pages
 
-  getPage: (page) -> @config.pages[page]
+  getPage: (page) -> @creativeConfig.pages[page]
 
-  getTemplate: -> @config.template
+  getTemplate: -> @creativeConfig.template
 
-  getPort: -> @config.port
+  getPort: -> @creativeConfig.port
 
-  getContext: -> @config
+  # get the accumulation of creative and form builder configs for this environment only
+  getContext: (env) ->
+    context = clone @creativeConfig
+    delete context.environments
+    context.env = {}
+    extend context.env, clone @creativeConfig.environments[env]
+    extend context.env, clone formbuilderConfig.environments[env]
+    context
 
   # Updates .balihoo-creative.json with the new form ID returned from Form Builder
+  #todo: this is broken!!! never updated when convert to multi-environment
   setCreativeFormId: (formid) ->
-    @config.creativeFormId = formid
-    fs.writeFileSync @configPath, JSON.stringify(@config, null, '  ')
+    @creativeConfig.creativeFormId = formid
+    fs.writeFileSync @creativeConfigPath, JSON.stringify(@creativeConfig, null, '  ')
 
 module.exports = (configPath) -> new ConfigManager configPath
 
