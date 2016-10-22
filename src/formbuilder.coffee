@@ -13,185 +13,98 @@ msg = new Messages 'FORMBUILDER'
 class Forms
   constructor: (@emit, @assets, @samples) ->
   config: (@config) ->
-    #todo: DRY all the request stuff by setting @envRequest to request.defaults with baseUrl, auth
-  getForm: (formid, version = 1, cb) ->
-    request "#{@config.env.url}/forms/#{formid}/version/#{version}", {
+    @envRequest = Promise.promisify request.defaults
+      baseUrl: @config.env.url
+      auth:
+        username: @config.env.username
+        password: @config.env.password
+        
+  checkForFormBuilderError: (errorMsgLead) ->
+    (incomingMessage) ->
+      if Array.isArray incomingMessage
+        incomingMessage = incomingMessage[0]
+      Promise.try ->
+        if incomingMessage.statusCode // 100 isnt 2 #not a 2xx response
+          try
+            body = JSON.parse incomingMessage.body
+            err = new Error body.message
+            err.code = body.code
+            return Promise.reject err
+          catch error
+            return Promise.reject new Error "#{errorMsgLead} (#{incomingMessage.statusCode}): #{incomingMessage.body.message or JSON.stringify incomingMessage.body}"
+        return incomingMessage
+
+  # Utility functions for querying the existing form
+  getForm: (formid, version = 1) ->
+    @envRequest "/forms/#{formid}/version/#{version}", {
       method: 'GET'
-      auth:
-        username: @config.env.username
-        password: @config.env.password
-    }, (error, incomingMessage, response) ->
-      if error
-        return cb error
-      if incomingMessage.statusCode // 100 isnt 2 #not a 2xx response
-        try
-          body = JSON.parse incomingMessage.body
-          err = new Error body.message
-          err.code = body.code
-          return cb err
-        catch ex
-          console.log incomingMessage.body
-          return cb new Error "Error getting form (#{incomingMessage.statusCode}): #{incomingMessage.body}"
-      cb error, incomingMessage, response
+    }
+    .then @checkForFormBuilderError "Error getting form"
   
-  saveForm: (formid, version, form, cb) ->
-    request "#{@config.env.url}/forms/#{formid}/version/#{version}", {
-      method: 'PUT'
-      json: form
-      auth:
-        username: @config.env.username
-        password: @config.env.password
-    }, (error, incomingMessage, response) ->
-      if error
-        return cb error
-      if incomingMessage.statusCode // 100 isnt 2 #not a 2xx response
-        try
-          body = JSON.parse incomingMessage.body
-          err = new Error body.message
-          err.code = body.code
-          return cb err
-        catch ex
-          console.log incomingMessage.body
-          return cb new Error "Error saving form (#{incomingMessage.statusCode}): #{incomingMessage.body}"
-      cb error, incomingMessage, response
-  
-  newForm: (form, cb) ->
-    request "#{@config.env.url}/forms", {
-      method: 'POST'
-      json: form
-      auth:
-        username: @config.env.username
-        password: @config.env.password
-    }, (error, incomingMessage, response) ->
-      if error
-        return cb error
-      if incomingMessage.statusCode // 100 isnt 2 #not a 2xx response
-        try
-          body = JSON.parse incomingMessage.body
-          err = new Error body.message
-          err.code = body.code
-          return cb err
-        catch ex
-          console.log incomingMessage.body
-          return cb new Error "Error creating new form (#{incomingMessage.statusCode}): #{incomingMessage.body}"
-      cb error, incomingMessage, response
-  
-  publishForm: (formid, form, cb) ->
-    request "#{@config.env.url}/forms/#{formid}/version/1/publish", {
-      method: 'POST'
-      json: form
-      auth:
-        username: @config.env.username
-        password: @config.env.password
-    }, (error, incomingMessage, response) ->
-      if error
-        return cb error
-      if incomingMessage.statusCode // 100 isnt 2 #not a 2xx response
-        try
-          body = JSON.parse incomingMessage.body
-          err = new Error body.message
-          err.code = body.code
-          return cb err
-        catch ex
-          console.log incomingMessage.body
-          return cb new Error "Error saving form (#{incomingMessage.statusCode}): #{incomingMessage.body}"
-      cb error, incomingMessage, response
-  
-  newDraft: (formid, form, cb) ->
-    request "#{@config.env.url}/forms/#{formid}/version", {
-      method: 'POST'
-      json: form
-      auth:
-        username: @config.env.username
-        password: @config.env.password
-    }, (error, incomingMessage, response) ->
-      if error
-        return cb error
-      if incomingMessage.statusCode // 100 isnt 2 #not a 2xx response
-        try
-          body = JSON.parse incomingMessage.body
-          err = new Error body.message
-          err.code = body.code
-          return cb err
-        catch ex
-          console.log incomingMessage.body
-          return cb new Error "Error creating new form (#{incomingMessage.statusCode}): #{incomingMessage.body.message}"
-      cb error, incomingMessage, response
-      
-  # todo: DRY this promise creation stuff by moving/combining with function above
   getFormVersion: (creativeFormId) ->
-    new Promise (resolve, reject) =>
-      @getForm creativeFormId, null, (err, incomingMessage, response) =>
-        if (err)
-          reject err
-        else
-          formData = JSON.parse(incomingMessage.body)
-          formVersion = formData.versions[0].version
-          resolve formVersion
+    @getForm creativeFormId
+    .then (incomingMessage) ->
+      formData = JSON.parse(incomingMessage.body)
+      return formData.versions[0].version
 
   getUpdatedDate: (creativeFormId, formVersion) ->
-    new Promise (resolve, reject) =>
-      @getForm creativeFormId, formVersion, (err, incomingMessage, response) =>
-        if (err)
-          reject err
-        else
-          formData = JSON.parse(incomingMessage.body)
-          updatedDate = formData.versions[0].updated
-          resolve updatedDate
+    @getForm creativeFormId, formVersion
+    .then (incomingMessage) ->
+      formData = JSON.parse(incomingMessage.body)
+      return formData.versions[0].updated
 
   getStatus: (creativeFormId) ->
-    new Promise (resolve, reject) =>
-      @getForm creativeFormId, null, (err, incomingMessage, response) =>
-        if (err)
-          reject err
-        else
-          formData = JSON.parse(incomingMessage.body)
-          formStatus = formData.versions[0].status
-          resolve formStatus
+    @getForm creativeFormId
+    .then (incomingMessage) ->
+      formData = JSON.parse(incomingMessage.body)
+      return formData.versions[0].status
 
-  saveNewForm: (creativeFormId, urls) ->
+  # Functions that save or update the form on form builder
+  saveNewForm: (urls) ->
     @emit 'progress', 'Creating new form...'
     creativeForm = @generateForm urls
-    @newForm creativeForm, (err, incomingMessage, response) =>
+    @envRequest "/forms", {
+      method: 'POST'
+      json: creativeForm
+    }
+    .then @checkForFormBuilderError "Error creating new form"
+    .then (incomingMessage) =>
       creativeFormId = incomingMessage.body.formid
-      if err
-        @emit 'progress', 'Failed to save new creative form:'
-        @emit 'progress', "savenewform: " + err.toString()
-        console.log "ERROR", err
-      else
-        @emit 'progress', 'Saved new creative form.'
-        @emit 'progress', '***Form ID: ' + creativeFormId + '***'
-        @config.setCreativeFormId creativeFormId #todo: make this work, and env specific
-        @emit 'complete'
+      @emit 'progress', 'Saved new creative form and draft.'
+      @emit 'progress', '***Form ID: ' + creativeFormId + '***'
+      @config.setCreativeFormId creativeFormId #todo: make this work, and env specific
 
   saveNewDraft: (creativeFormId, urls) ->
-    @getFormVersion(creativeFormId).then (formVersion) =>
-      @getUpdatedDate(creativeFormId, formVersion).then (updatedDate) =>
-        creativeForm = @generateForm urls, updatedDate
-        @newDraft creativeFormId, creativeForm, (err, incomingMessage, response) =>
-          if err
-            @emit 'progress', 'Failed to save creative form:'
-            @emit 'progress', "savenewdraft:" + err.toString()
-            console.log "ERROR", err
-          else
-            @emit 'progress', 'Saved creative form.'
-            @emit 'progress', '***Form ID: ' + creativeFormId + '***'
-            @emit 'complete'
+    @getFormVersion(creativeFormId)
+    .then (formVersion) =>
+      @getUpdatedDate(creativeFormId, formVersion)
+    .then (updatedDate) =>
+      creativeForm = @generateForm urls, updatedDate
+      @envRequest "/forms/#{creativeFormId}/version", {
+        method: 'POST'
+        json: creativeForm
+      }
+    .then @checkForFormBuilderError "Error creating new draft version"
+    .then =>
+      @emit 'progress', 'Created new draft version of creative form.'
+      @emit 'progress', '***Form ID: ' + creativeFormId + '***'
 
   saveExistingDraft: (creativeFormId, urls) ->
-    @getFormVersion(creativeFormId).then (formVersion) =>
-      @getUpdatedDate(creativeFormId, formVersion).then (updatedDate) =>
-        creativeForm = @generateForm urls, updatedDate
-        @saveForm creativeFormId, formVersion, creativeForm, (err, incomingMessage, response) =>
-          if err
-            @emit 'progress', 'Failed to save creative form:'
-            @emit 'progress', "saveexistingdraft: " + err.toString()
-            console.log "ERROR", err
-          else
-            @emit 'progress', 'Saved creative form.'
-            @emit 'progress', '***Form ID: ' + creativeFormId + '***'
-            @emit 'complete'
+    @getFormVersion(creativeFormId)
+    .then (formVersion) =>
+      @getUpdatedDate(creativeFormId, formVersion)
+    .then (updatedDate) =>
+      creativeForm = @generateForm urls, updatedDate
+      @envRequest "/forms/#{creativeFormId}/version/#{formVersion}", {
+        method: 'PUT'
+        json: creativeForm
+      }
+    .then @checkForFormBuilderError "Error saving form"
+    .then =>
+      @emit 'progress', 'Updated existing draft of creative form.'
+      @emit 'progress', '***Form ID: ' + creativeFormId + '***'
 
+  # Generate new form parameters
   generateForm: (urls, updated = '') ->
     if @config.env.companionFormId isnt 0
       imports = [
@@ -249,6 +162,7 @@ class Forms
       result = JSON.stringify urls[obj]
     result
     
+  # Push the form to form builder.  The method of doing so depends on its current state on the server.
   push: (urls) ->
     @emit 'progress', 'Done uploading static assets.'
     @emit 'progress', 'Saving creative form...'
@@ -263,9 +177,10 @@ class Forms
       @emit 'progress', "***"
 
     if creativeFormId is 0
-      @saveNewForm(creativeFormId, urls)
+      @saveNewForm(urls)
     else
-      @getStatus(creativeFormId).then (formStatus) =>
+      @getStatus(creativeFormId)
+      .then (formStatus) =>
         if formStatus == 'Published'
           @saveNewDraft(creativeFormId, urls)
         else
@@ -276,21 +191,21 @@ class Forms
 class Assets
   constructor: (@emit, @assets) ->
     @dam = require 'balihoo-dam-client'
+    @dam.uploadFileAsync = Promise.promisify @dam.uploadFile
   config: (config) ->
     @dam.config formbuilder:config.env
   uploadAssets: ->
     urls = {}
-    #todo: why in the world are we primisfying our own function? Do Promise.try
-    uploadFile = Promise.promisify (asset, path, cb) =>
-      @dam.uploadFile path, (err, result) =>
-        if err
-          return cb err
+    uploadFile = (asset, path) =>
+      @dam.uploadFileAsync path
+      .then (result) =>
         @emit 'progress', (if result.fileExists then "Found " else "Uploaded ") + asset
         urls[asset] = result.url
-        cb err,
+        return {
           asset: asset
           path: path
           result: result
+        }
 
     uploads = []
     uploadHelper = (obj) =>
@@ -303,7 +218,8 @@ class Assets
 
     @emit 'progress', "Uploading #{uploads.length} static assets..."
     new Promise (resolve, reject) =>
-      Promise.all(uploads).then (assets) ->
+      Promise.all(uploads)
+      .then ->
         resolve urls
       .error (reason) ->
         reject "Upload of static assets failed because: #{reason}"
@@ -328,9 +244,9 @@ class FormBuilder extends EventEmitter
     @assetClient.uploadAssets()
     .then (urls) =>
       @formsClient.push urls
-    .error (reason) =>
-      console.log 'stuff error'
-      @emit 'progress', 'push: ' + reason.toString()
+    .catch (error) =>
+      @emit 'progress', error.toString()
+    .finally =>
       @emit 'complete'
 
 module.exports = (options) -> new FormBuilder options
