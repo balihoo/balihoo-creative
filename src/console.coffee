@@ -128,7 +128,10 @@ class Console extends EventEmitter
           res.writeHead 200, 'Content-Type': 'text/html'
           if @options.config
             try
-              context = static: "/#{@options.path}/static"
+              context =
+                static: "/#{@options.path}/static"
+                environments: @options.config.getAllEnvironmentsForSelector()
+              context.hasEnvironments = context.environments.length > 0
               merge @options.config.getContext(), context
               res.end mustache.render "#{@content[@indexPage].content}", context
             catch err

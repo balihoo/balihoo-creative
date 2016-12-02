@@ -29,12 +29,17 @@
           <span id="testResults">...</span>
         </div>
         <div class="pane">
-          <button id="push">Push Creative</button>
-          <select class="environment">
-              <option value="dev">Development</option>
-              <option value="stage">Stage</option>
-              <option value="prod">Production</option>
-          </select>
+          {{#hasEnvironments}}
+            <button id="push">Push Creative</button>
+            <select class="environment">
+              {{#environments}}
+                <option value="{{name}}" data-isprod="{{isProd}}">{{displayName}}</option>
+              {{/environments}}
+            </select>
+          {{/hasEnvironments}}
+          {{^hasEnvironments}}
+            <div style="font-size:12px;">No form builder environments configured for push</div>
+          {{/hasEnvironments}}
         </div>
       </div>
     </div>
@@ -52,18 +57,18 @@
    </body>
 
     <script>
-        $('#push').click(function() {
-            var environment = $('.environment').val();
-            if (environment == 'prod') {
-                var pushToProd  = confirm('Do you want to publish this creative to production?');
-                if (pushToProd == true) {
-                    pushCreative(environment);
-                }
-            }
-            else {
-                pushCreative(environment);
-            }
-        });
+    $('#push').click(function() {
+      var envOption = $('.environment')[0].selectedOptions[0];
+      var envName = envOption.value;
+      console.log(envName);
+      if (envOption.dataset['isprod'] == 'true') {
+        var pushToProd  = confirm('Do you want to publish this creative to production?');
+        if (pushToProd !== true) {
+            return;
+        }
+      }
+      pushCreative(envName);
+    });
     </script>
 </html>
 

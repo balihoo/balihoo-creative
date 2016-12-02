@@ -14,25 +14,27 @@ msg = new Messages 'CONFIG'
 
 class ConfigManager extends EventEmitter
   constructor: (@creativeConfigPath) ->
-    try
-      @formbuilderConfig = require ConfigManager.formbuilderConfigPath
-    catch e
-      console.warn 'Warning: form builder config file not found or incorrectly formatted'.yellow
-      console.warn 'You will not be able to push creatives to form builder'.yellow
-      console.warn 'To create a form builder config, exit and run "balihoo-creative --config"'.yellow
     msg.debug 'Instantiating configmanager'
-    @creativeConfig = {}
     @ingoreNextUpdate = false
     msg.debug "Watching creative config file: #{@creativeConfigPath.yellow}"
     chokidar.watch(@creativeConfigPath, {persistent: yes, ignoreInitial: yes, interval: 50}).on 'change', (event, path) =>
       msg.debug 'Config file updated'
       @needReload()
+    @loadFormbuilderConfig()
     @workingDir = path.basename process.cwd()
     @loadCreativeConfig()
 
   needReload: ->
     if @timer then clearTimeout @timer
     @timer = setTimeout @loadCreativeConfig, 200
+  
+  loadFormbuilderConfig: ->
+    try
+      @formbuilderConfig = require ConfigManager.formbuilderConfigPath
+    catch e
+      console.warn 'Warning: form builder config file not found or incorrectly formatted'.yellow
+      console.warn 'You will not be able to push creatives to form builder'.yellow
+      console.warn 'To create a form builder config file, exit and run "balihoo-creative --config"'.yellow
 
   loadCreativeConfig: ->
     if not fs.existsSync @creativeConfigPath
@@ -86,6 +88,33 @@ class ConfigManager extends EventEmitter
     if @formbuilderConfig
       extend context.env, clone @formbuilderConfig.environments[env]
     context
+    
+  # Get info on all pushable environments. Just info pertinent to displaying.
+  getAllEnvironmentsForSelector: ->
+    envsObj = {} #use an object to grab a unique list of common environment names
+    for key of @creativeConfig?.environments
+      if @formbuilderConfig?.environments[key]
+        envsObj[key] = true
+      else
+        console.warn "Config environment #{key} exists in creative config but not form builder config"
+    for key of @formbuilderConfig?.environments
+      if @creativeConfig?.environments[key]
+        envsObj[key] = true
+      else
+        console.warn "Config environment #{key} exists in form builder config but not creative config"
+    # Now transform it into an array of objects describing each env
+    envsArray = []
+    for key of envsObj
+      envsArray.push {
+        name: key
+        displayName: @formbuilderConfig.environments[key].displayName or switch key
+          when 'dev' then 'Development'
+          when 'stage' then 'Stage'
+          when 'prod' then 'Production'
+          else key
+        isProd: @formbuilderConfig.environments[key].url.indexOf('fb.balihoo-cloud.com') >= 0
+      }
+    envsArray
 
   # Updates .balihoo-creative.json with the new form ID returned from Form Builder
   #todo: this is broken!!! never updated when convert to multi-environment
