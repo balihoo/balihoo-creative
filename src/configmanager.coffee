@@ -5,15 +5,17 @@ mkdirp = require 'mkdirp'
 colors    = require 'colors'
 chokidar        = require 'chokidar'
 {EventEmitter}  = require 'events'
+RequirementMissingError = require './requirementMissingError'
 clone = require 'clone'
 extend = require 'extend'
 
 # Set up logging
 Messages  = require './messages'
 msg = new Messages 'CONFIG'
+creativeConfigPathDefault = './.balihoo-creative.json'
 
 class ConfigManager extends EventEmitter
-  constructor: (@creativeConfigPath) ->
+  constructor: (@creativeConfigPath = creativeConfigPathDefault) ->
     msg.debug 'Instantiating configmanager'
     @ingoreNextUpdate = false
     msg.debug "Watching creative config file: #{@creativeConfigPath.yellow}"
@@ -21,7 +23,6 @@ class ConfigManager extends EventEmitter
       msg.debug 'Config file updated'
       @needReload()
     @loadFormbuilderConfig()
-    @workingDir = path.basename process.cwd()
     @loadCreativeConfig()
 
   needReload: ->
@@ -38,38 +39,45 @@ class ConfigManager extends EventEmitter
 
   loadCreativeConfig: ->
     if not fs.existsSync @creativeConfigPath
-      # By default, use the current working directory as the project name
-      msg.info "Creating config for: #{@workingDir.yellow}"
-      @creativeConfig =
-        name: @workingDir
-        description: ''
-        channel: 'Local Websites'
-        brands: []
-        environments:
-          dev:
-            creativeFormId: 0
-            companionFormId: 0
-            endpoint: 0
-          stage:
-            creativeFormId: 0
-            companionFormId: 0
-            endpoint: 0
-          prod:
-            creativeFormId: 0
-            companionFormId: 0
-            endpoint: 0
-        pages: ['index', 'assets', 'urls', 'sampledata', 'test', 'config', 'notfound']  #todo: why all these as default?
-        template: 'main'
-        port: 8088
-      @saveCreativeConfig()
-    else
-      msg.debug "Loading project config file #{@creativeConfigPath.yellow}"
-      @creativeConfig = JSON.parse fs.readFileSync(@creativeConfigPath, encoding:'utf8')
+      throw new RequirementMissingError "Creative config file not found: #{@creativeConfigPath}"
+
+    msg.debug "Loading project config file #{@creativeConfigPath.yellow}"
+    @creativeConfig = JSON.parse fs.readFileSync(@creativeConfigPath, encoding:'utf8')
     @emit 'update'
 
   saveCreativeConfig: ->
     msg.debug "Saving config file #{@creativeConfigPath.yellow}"
     fs.writeFileSync @creativeConfigPath, JSON.stringify(@creativeConfig, null, '  ')
+
+  @createNewFromTemplate: (creativeConfigPath = creativeConfigPathDefault) ->
+    # By default, use the current working directory as the project name
+    workingDir = path.basename process.cwd()
+    if fs.existsSync creativeConfigPath
+      msg.warn "Creative config file already exists at #{creativeConfigPath}"
+      return
+    msg.info "Creating config for: #{workingDir.yellow}"
+    creativeConfig =
+      name: workingDir
+      description: ''
+      channel: 'Local Websites'
+      brands: []
+      environments:
+        dev:
+          creativeFormId: 0
+          companionFormId: 0
+          endpoint: 0
+        stage:
+          creativeFormId: 0
+          companionFormId: 0
+          endpoint: 0
+        prod:
+          creativeFormId: 0
+          companionFormId: 0
+          endpoint: 0
+      pages: ['index', 'assets', 'urls', 'sampledata', 'test', 'config', 'notfound']  #todo: why all these as default?
+      template: 'main'
+      port: 8088
+    fs.writeFileSync creativeConfigPath, JSON.stringify(creativeConfig, null, '  ')
 
   hasPage: (page) -> page in @creativeConfig.pages
 

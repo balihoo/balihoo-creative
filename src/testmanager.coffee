@@ -5,15 +5,17 @@ colors          = require 'colors'
 coffee          = require 'coffee-script'
 chokidar        = require 'chokidar'
 {EventEmitter}  = require 'events'
+RequirementMissingError = require './requirementMissingError'
 Convert   = require 'ansi-to-html'
 convert   = new Convert newLine: yes
 
 # Set up logging
 Messages  = require './messages'
 msg = new Messages 'TESTS'
+testDirDefault = 'test'
 
 class TestManager extends EventEmitter
-  constructor: (@testDir = 'test') ->
+  constructor: (@testDir = testDirDefault) ->
     msg.debug 'Instantiating testmanager'
     @tests = {}
     @scan()
@@ -27,7 +29,7 @@ class TestManager extends EventEmitter
         msg.debug "Ignoring event #{event} on path #{path.gray}"
 
   # Copy files from srcDir to destDir
-  copy: (srcDir, destDir) ->
+  @copy: (srcDir, destDir) ->
     for fileName in fs.readdirSync srcDir
       srcPath = path.join srcDir, fileName
       destPath = path.join destDir, fileName
@@ -39,15 +41,22 @@ class TestManager extends EventEmitter
   needScan: ->
     if @timer then clearTimeout @timer
     @timer = setTimeout @scan, 200
+    
+  @createNewFromTemplate: (testDir = testDirDefault) ->
+    base = path.join process.cwd(), testDir
+    if fs.existsSync base
+      msg.warn "Test directory already exists at #{base}"
+      return
+    msg.info "Creating test directory and copying example tests in #{base.yellow}"
+    fs.mkdirSync base
+    TestManager.copy path.normalize(__dirname + '/../tutorial/test/'), base
 
   # Update the files 
   scan: (baseDir = process.cwd()) =>
     base = path.join baseDir, @testDir 
     msg.debug "Scanning for test files in #{base.yellow}"
     if not fs.existsSync base
-      msg.info "Creating test directory and copying example tests in #{base.yellow}"
-      fs.mkdirSync base
-      @copy path.normalize(__dirname + '/../tutorial/test/'), base
+      throw new RequirementMissingError "Test directory not found: #{base}"
     tests = {}
     for fileName in fs.readdirSync base
       if fileName.match /\.coffee$/

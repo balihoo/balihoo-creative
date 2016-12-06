@@ -4,14 +4,16 @@ path      = require 'path'
 colors    = require 'colors'
 chokidar        = require 'chokidar'
 {EventEmitter}  = require 'events'
+RequirementMissingError = require './requirementMissingError'
 
 # Set up logging
 Messages  = require './messages'
 msg = new Messages 'SAMPLE'
-
+sampleDirDefault = 'sampledata'
+  
 class SampleManager extends EventEmitter
 
-  constructor: (@sampleDir) ->
+  constructor: (@sampleDir = sampleDirDefault) ->
     msg.debug 'Instantiating samplemanager'
     @samples = {}
     msg.debug "Watching directory: #{@sampleDir.yellow}"
@@ -24,7 +26,7 @@ class SampleManager extends EventEmitter
       else
         msg.debug "Ignoring change to #{path.yellow}"
 
-  copy: (srcDir, destDir) ->
+  @copy: (srcDir, destDir) ->
     for fileName in fs.readdirSync srcDir
       srcPath = path.join srcDir, fileName
       destPath = path.join destDir, fileName
@@ -34,17 +36,24 @@ class SampleManager extends EventEmitter
         msg.debug "  #{fileName.white}"
         fs.writeFileSync(destPath, fs.readFileSync(srcPath))
 
-   needScan: ->
+  needScan: ->
     if @timer then clearTimeout @timer
     @timer = setTimeout @scan, 200
+    
+  @createNewFromTemplate: (sampleDir = sampleDirDefault) ->
+    base = path.join process.cwd(), sampleDir
+    if fs.existsSync base
+      msg.warn "Sample data directory already exists at #{base}"
+      return
+    msg.info "Creating sample data directory at #{base.yellow}"
+    fs.mkdirSync base
+    msg.debug "Copying example sample data files to #{base.yellow}"
+    SampleManager.copy path.normalize(__dirname + '/../tutorial/sampledata/'), base
 
-  scan: (baseDir = process.cwd()) =>
-    base = path.join baseDir, @sampleDir 
+  scan: ->
+    base = path.join process.cwd(), @sampleDir
     if not fs.existsSync base
-      msg.info "Creating samples directory at #{base.yellow}"
-      fs.mkdirSync base
-      msg.debug "Copying example sample files to #{base.yellow}"
-      @copy path.normalize(__dirname + '/../tutorial/sampledata/'), base
+      throw new RequirementMissingError "Sample data directory not found: #{base}"
     @samples = {}
     for fileName in fs.readdirSync base
       if fileName.match /\.json$/

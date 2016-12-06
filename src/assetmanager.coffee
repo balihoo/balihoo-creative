@@ -4,13 +4,15 @@ path      = require 'path'
 colors    = require 'colors'
 chokidar        = require 'chokidar'
 {EventEmitter}  = require 'events'
+RequirementMissingError = require './requirementMissingError'
 
 # Set up logging
 Messages  = require './messages'
 msg = new Messages 'ASSETS'
+assetsDirDefault = 'assets'
 
 class AssetManager extends EventEmitter
-  constructor: (@assetsDir = 'assets') ->
+  constructor: (@assetsDir = assetsDirDefault) ->
     msg.debug 'Instantiating assetmanager'
     @assets = {}
     @partials = {}
@@ -36,10 +38,7 @@ class AssetManager extends EventEmitter
     base = path.join process.cwd(), @assetsDir
     # If there is no assets directory, then we should build one
     if not fs.existsSync base
-      msg.info "Asset directory not found, creating #{base.yellow}"
-      fs.mkdirSync base
-      msg.debug "Copying example asset files to #{base.yellow}"
-      @rcopy path.normalize(__dirname + '/../tutorial/assets/'), base
+      throw new RequirementMissingError "Assets directory not found: #{base}"
 
     @staticFiles = {}
     @partials = {}
@@ -80,8 +79,18 @@ class AssetManager extends EventEmitter
     /^\./.test(path)  || # Ignore files that start with .
     /[\/\\]\./.test(path) || # Ignore files that start with /.
     /~$/.test(path)      # Ignore files that end in ~
+  
+  @createNewFromTemplate: (assetsDir = assetsDirDefault) ->
+    base = path.join process.cwd(), assetsDir
+    if fs.existsSync base
+      msg.warn "Assets directory already exists at #{base}"
+      return
+    msg.info "Creating assets directory #{base.yellow}"
+    fs.mkdirSync base
+    msg.debug "Copying example asset files to #{base.yellow}"
+    AssetManager.rcopy path.normalize(__dirname + '/../tutorial/assets/'), base
 
-  rcopy: (srcDir, destDir, indent = '  ') ->
+  @rcopy: (srcDir, destDir, indent = '  ') ->
     for fileName in fs.readdirSync srcDir
       srcPath = path.join srcDir, fileName
       destPath = path.join destDir, fileName
@@ -90,7 +99,7 @@ class AssetManager extends EventEmitter
       if stat.isDirectory()
         msg.debug "#{indent}#{fileName.white}"
         fs.mkdirSync destPath unless fs.existsSync destPath
-        @rcopy srcPath, destPath, indent + '  ' 
+        AssetManager.rcopy srcPath, destPath, indent + '  ' 
       else if not fileName.match /\.swp$/
         msg.debug "#{indent}  #{fileName.white}"
         fs.writeFileSync(destPath, fs.readFileSync(srcPath))
