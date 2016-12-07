@@ -7,7 +7,7 @@ with Balihoo's online resources like Form-Builder & BLIP to make template design
 maintenance a seemless, painless experience.
 
 ## Version
-0.2.1
+0.3.0
 
 ## Installation
   Make sure you have a recent version of node and npm installed and
@@ -26,29 +26,28 @@ maintenance a seemless, painless experience.
 ## Usage
 
   The app contains its own extensive documentation and tutorial. To view the docs
-  and tutorial: first, install the app, create an empty directory and run the app
-  within that directory.
+  and tutorial: first, install the app, create an empty directory, run the app with --new within that directory, then run the app without parameters.
   ```shellscript
   mkdir /tmp/project
   cd /tmp/project
+  balihoo-creative --new
   balihoo-creative
   ```
-  Running the app in an empty directory will generate the tutorial project in that
-  directory, run the web server, and open your browser to the *Getting Started*
-  tutorial page.
+  Running the app with --new in an empty directory will generate the tutorial project in that
+  directory.  Running without parameters will run the web server, and open your browser to the *Getting Started* tutorial page.
 
 ## Contribute
 
-  To contribute to this project, first fork it on github. Then, clone your fork to
+  To contribute to this project you will want to run locally with the in-development codebase rather than the published package.  If you have the published package installed globally you'll want to uninstall it.
+  ```shellscript
+  sudo npm -g uninstall balihoo-creative
+  ```
+  
+  To begin making changes to this tool, first fork it on github. Then, clone your fork to
   your workstation.
   ```shellscript
   git clone https://github.com/balihoo/balihoo-creative.git
   cd balihoo-creative
-  ```
-  
-  You will be testing the in-development code instead of the published package, so you should NOT have the tool installed globally.  If it is, you can uninstall it with
-  ```shellscript
-  sudo npm -g uninstall balihoo-creative
   ```
 
   Then, run npm install and link the binary to your development copy.

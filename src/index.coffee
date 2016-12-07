@@ -16,7 +16,13 @@ msg = new Messages 'MAIN'
 
 msg.info "*** Balihoo Web Designer Toolkit ***".blue
 
-if argv.fbconfig
+if argv.help
+  msg.info "Command line options:"
+  msg.info "  --help : display this message."
+  msg.info "  --fbconfig : create a new form builder config file for pushing creatives."
+  msg.info "  --new : create a new tutorial example website in this directory."
+  msg.info "When run without any parameters, the tool will start a web server and open your browser to a development console showing the web page content in this directory."
+else if argv.fbconfig
   msg.info "Creating new form builder config file at #{configManager.formbuilderConfigPath}"
   configManager.createFormbuilderConfig (err) ->
     if err
