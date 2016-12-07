@@ -16,7 +16,7 @@ msg = new Messages 'MAIN'
 
 msg.info "*** Balihoo Web Designer Toolkit ***".blue
 
-if argv.config
+if argv.fbconfig
   msg.info "Creating new form builder config file at #{configManager.formbuilderConfigPath}"
   configManager.createFormbuilderConfig (err) ->
     if err

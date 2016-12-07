@@ -35,7 +35,7 @@ class ConfigManager extends EventEmitter
     catch e
       console.warn 'Warning: form builder config file not found or incorrectly formatted'.yellow
       console.warn 'You will not be able to push creatives to form builder'.yellow
-      console.warn 'To create a form builder config file, exit and run "balihoo-creative --config"'.yellow
+      console.warn 'To create a form builder config file, exit and run "balihoo-creative --fbconfig"'.yellow
 
   loadCreativeConfig: ->
     if not fs.existsSync @creativeConfigPath

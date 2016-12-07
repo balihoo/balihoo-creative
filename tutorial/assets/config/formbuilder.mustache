@@ -1,0 +1,35 @@
+<div class="bs-docs-section">
+	<h1 id="fb-config-file" class="page-header">Form Builder Configuration File</h1>
+
+	<p class="lead">Those who will push creatives to Form Builder will need a Form Builder credentials file.</p>
+
+	<p>Form Builder credentials are tied to the user, not any specific creative, and are stored in your user's home directory at <code>~/.config/balihoo-creative/formbuilder.json</code>.  Like the creative config, this file contains sections for multiple environments, and these environment names much match the creative config.</p>
+	<p>
+		To create an initial Form Builder config file, you can run <code>balihoo-creative --fbconfig</code>.  Following is an example:
+	<div class="highlight"><pre><code class="language-js" data-lang="js">{
+  "environments": {
+    "dev": {
+      "url": "https://fb.dev.balihoo-cloud.com",
+      "username": "your-dev-username",
+      "password": "your-dev-password"
+    },
+    "stage": {
+      "url": "https://fb.stage.balihoo-cloud.com",
+      "username": "your-stage-username",
+      "password": "your-stage-password"
+    },
+    "dev": {
+      "url": "https://fb.balihoo-cloud.com",
+      "username": "your-prod-username",
+      "password": "your-prod-password"
+    }
+  }
+}</code></pre></div>
+	<p>This config file is optional.  If it does not exist you will be warned that you will be unable to push to Form Builder, and the push button will be absent from the web console.
+	</p>
+	<h3 id="url"><code>url</code></h3>
+	<p>Shows the location of this environment.  These values are set up correctly in the initial file and do not need to be edited.</p>
+	<h3 id="username-password"><code>username</code> &amp; <code>password</code></h3>
+	<p>Basic authentication credentials will be provided by Balihoo.  These credentials are linked to your own user account in our auth provider <a href="https://stormpath.com/">Stormpath</a>, and in that system are called your API Key.  The credentials you receive from Balihoo may therefore contain entries for apiKey.id and apiKey.secret, which should be copied into username and password respectively.  This should be done for each environment that you will be pushing forms to.</p>
+
+</div>

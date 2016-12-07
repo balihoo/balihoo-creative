@@ -1,0 +1,20 @@
+<div class="bs-docs-section">
+	<h1 id="nofb" class="page-header">Without Form Builder Access</h1>
+
+	<p class="lead">Those with no Form Builder access publish in a different path.</p>
+	
+	<p>Form Builder is used to host and serve creatives for ad fulfillment.  Certain creative authors will not have access to directly publish their own work for fulfillment.  In this case, the following workflow should be followed.</p>
+	
+	<p><ol>
+		<li>Balihoo and the author setup shared access to a code repository.  Consider whether this creative should be kept private until published.</li>
+		<li>Balihoo creates the <a href="/sampledata#companion-form">companion form</a> with all expected location data values.</li>
+		<li>Balihoo provides the companion form id and endpoint form id to the author.  Author places these values in the <a href="#creative-config-file">creative config file</a>.</li>
+		<li>Balihoo also provides an example of the location data from the companion form. Author saves this as a <a href="/sampledata#sample-files">sample data file</a>.</li>
+		<li>Author creates/iterates on the creative locally as needed.  Code should be periodically checked into the source repository.</li>
+		<li>When the work is ready to review, author creates a pull request, code review, or other means of offering up the changeset for Balihoo review.</li>
+		<li>Balihoo subjects the changes to a code review.</li>
+		<li>Balihoo pulls down the code and uses the balihoo-creative tool to push those changes to one of our environments.</li>
+		<li>Further review in a live environment.</li>
+		<li>Balihoo publishes to prod when all reviews pass.</li>
+	</ol></p>
+</div>

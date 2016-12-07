@@ -1,0 +1,29 @@
+<div class="bs-docs-section">
+	<h1 id="setup" class="page-header">Setup</h1>
+
+	<p class="lead">One-time setup for new projects.</p>
+
+	<h3>Project Files</h3>
+	<p>There are a few directories and files that are required to be part of any creative project, and if you attempt to run the tool without all of them it will error.  The best way to create these is to run the creative tool with the --new parameter.
+	<div class="highlight">
+		<pre>
+			<code class="language-bash" data-lang="bash">mkdir newProject
+cd newProject
+balihoo-creative --new</code>
+		</pre>
+	</div>
+	<p>This creates a copy of the tutorials site (this site)
+
+	<h3>Form Builder Credentials</h3>
+	<p>
+		Creatives will be pushed to form builder when they are complete, where they can be used to fulfill ads.  If you have form builder credentials and will be pushing forms, you will also need a form builder credentials file.  This file is not required to run the tool, only if you will push your work to form builder.
+	</p>
+	<p>
+		This file will exist in your user's home directory and used by all creatives on your system.  A template form builder credentials file can be created with the --fbconfig parameter.
+		<div class="highlight">
+			<pre>
+				<code class="language-bash" data-lang="bash">balihoo-creative --fbconfig</code>
+			</pre>
+		</div>
+	</p>
+</div> <!--bs-docs-section -->

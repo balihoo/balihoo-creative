@@ -1,0 +1,10 @@
+<div class="bs-docs-section">
+	<h1 id="companion-form" class="page-header">Companion Form</h1>
+	<p class="lead">Companion forms define the location data that will be provided to your creative.</p>
+
+	<h3 id="create">Creating a Companion Form</h3>
+	<p>Prior to pushing your creative to Form Builder, you should ensure that a companion form exists that contains all expected data fields.  You should use the Form Builder web interface to create and update this form as needed.  As soon as the companion form has been created, it should be published so that it is usable by other forms.  Note its form id.</p>
+	
+	<h3 id="link">Linking the Companion Form</h3>
+	<p>To associate your creative with the companion form that will provide its data, you must manually edit the <a href="config#creative-config-file">creative config file</a> and save the form id as the <code>companionFormId</code> for that environment.  This value must be added prior to pushing a creative for the first time.  The form id will remain the same from then on, so there is no need to update this file as the companion form contents change.</p>
+</div>

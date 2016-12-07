@@ -45,6 +45,11 @@ maintenance a seemless, painless experience.
   git clone https://github.com/balihoo/balihoo-creative.git
   cd balihoo-creative
   ```
+  
+  You will be testing the in-development code instead of the published package, so you should NOT have the tool installed globally.  If it is, you can uninstall it with
+  ```shellscript
+  sudo npm -g uninstall balihoo-creative
+  ```
 
   Then, run npm install and link the binary to your development copy.
   ```shellscript
