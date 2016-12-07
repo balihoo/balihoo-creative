@@ -60,7 +60,6 @@
     $('#push').click(function() {
       var envOption = $('.environment')[0].selectedOptions[0];
       var envName = envOption.value;
-      console.log(envName);
       if (envOption.dataset['isprod'] == 'true') {
         var pushToProd  = confirm('Do you want to publish this creative to production?');
         if (pushToProd !== true) {
