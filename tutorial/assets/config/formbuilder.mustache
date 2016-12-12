@@ -31,5 +31,7 @@
 	<p>Shows the location of this environment.  These values are set up correctly in the initial file and do not need to be edited.</p>
 	<h3 id="username-password"><code>username</code> &amp; <code>password</code></h3>
 	<p>Basic authentication credentials will be provided by Balihoo.  These credentials are linked to your own user account in our auth provider <a href="https://stormpath.com/">Stormpath</a>, and in that system are called your API Key.  The credentials you receive from Balihoo may therefore contain entries for apiKey.id and apiKey.secret, which should be copied into username and password respectively.  This should be done for each environment that you will be pushing forms to.</p>
+	<h3 id="displayName"><code>displayName</code></h3>
+	<p>These environments will be the choices in the console for where you can push your creatives.  They will be given some default friendlier names, for example 'dev' appears as 'Development'.  If you want to customize these labels of if you add a new environment, you can supply an optional displayName property.</p>
 
 </div>
