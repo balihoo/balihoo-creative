@@ -5,6 +5,7 @@ colors    = require 'colors'
 chokidar        = require 'chokidar'
 {EventEmitter}  = require 'events'
 RequirementMissingError = require './requirementMissingError'
+configManager = require './configmanager'
 
 # Set up logging
 Messages  = require './messages'

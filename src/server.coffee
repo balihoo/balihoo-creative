@@ -19,8 +19,8 @@ merge = (src, dest) ->
 exports.start = (options) =>
   msg.debug 'Setting up HTTP server'
   options  = options || {}
-  @assets    = options.assets    || new (require './assetmanager')()
   @config    = options.config    || new (require './configmanager')()
+  @assets    = options.assets    || new (require './assetmanager')()
   @tests     = options.tests     || new (require './testmanager')()
   @samples   = options.samples   || new (require './samplemanager')()
   @formbuilder = options.formbuilder || new (require './formbuilder')(

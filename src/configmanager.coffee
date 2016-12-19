@@ -42,12 +42,12 @@ class ConfigManager extends EventEmitter
       throw new RequirementMissingError "Creative config file not found: #{@creativeConfigPath}"
 
     msg.debug "Loading project config file #{@creativeConfigPath.yellow}"
-    @creativeConfig = JSON.parse fs.readFileSync(@creativeConfigPath, encoding:'utf8')
+    ConfigManager.creativeConfig = JSON.parse fs.readFileSync(@creativeConfigPath, encoding:'utf8')
     @emit 'update'
 
   saveCreativeConfig: ->
     msg.debug "Saving config file #{@creativeConfigPath.yellow}"
-    fs.writeFileSync @creativeConfigPath, JSON.stringify(@creativeConfig, null, '  ')
+    fs.writeFileSync @creativeConfigPath, JSON.stringify(ConfigManager.creativeConfig, null, '  ')
 
   @createNewFromTemplate: (creativeConfigPath = creativeConfigPathDefault) ->
     # By default, use the current working directory as the project name
@@ -79,20 +79,20 @@ class ConfigManager extends EventEmitter
       port: 8088
     fs.writeFileSync creativeConfigPath, JSON.stringify(creativeConfig, null, '  ')
 
-  hasPage: (page) -> page in @creativeConfig.pages
+  hasPage: (page) -> page in ConfigManager.creativeConfig.pages
 
-  getPage: (page) -> @creativeConfig.pages[page]
+  getPage: (page) -> ConfigManager.creativeConfig.pages[page]
 
-  getTemplate: -> @creativeConfig.template
+  getTemplate: -> ConfigManager.creativeConfig.template
 
-  getPort: -> @creativeConfig.port
+  getPort: -> ConfigManager.creativeConfig.port
 
   # get the accumulation of creative and form builder configs for this environment only
   getContext: (env) ->
-    context = clone @creativeConfig
+    context = clone ConfigManager.creativeConfig
     delete context.environments
     context.env = {}
-    extend context.env, clone @creativeConfig.environments[env]
+    extend context.env, clone ConfigManager.creativeConfig.environments[env]
     if @formbuilderConfig
       extend context.env, clone @formbuilderConfig.environments[env]
     context
@@ -100,13 +100,13 @@ class ConfigManager extends EventEmitter
   # Get info on all pushable environments. Just info pertinent to displaying.
   getAllEnvironmentsForSelector: ->
     envsObj = {} #use an object to grab a unique list of common environment names
-    for key of @creativeConfig?.environments
+    for key of ConfigManager.creativeConfig?.environments
       if @formbuilderConfig?.environments[key]
         envsObj[key] = true
       else
         console.warn "Config environment #{key} exists in creative config but not form builder config"
     for key of @formbuilderConfig?.environments
-      if @creativeConfig?.environments[key]
+      if ConfigManager.creativeConfig?.environments[key]
         envsObj[key] = true
       else
         console.warn "Config environment #{key} exists in form builder config but not creative config"
@@ -127,8 +127,8 @@ class ConfigManager extends EventEmitter
   # Updates .balihoo-creative.json with the new form ID returned from Form Builder
   #todo: this is broken!!! never updated when convert to multi-environment
   setCreativeFormId: (formid) ->
-    @creativeConfig.creativeFormId = formid
-    fs.writeFileSync @creativeConfigPath, JSON.stringify(@creativeConfig, null, '  ')
+    ConfigManager.creativeConfig.creativeFormId = formid
+    fs.writeFileSync @creativeConfigPath, JSON.stringify(ConfigManager.creativeConfig, null, '  ')
     
   ###
   # STATICS
@@ -160,6 +160,7 @@ class ConfigManager extends EventEmitter
           else
             return cb err
         cb()
+  @creativeConfig = {} #will be read by other processes
 
 
 module.exports = ConfigManager
