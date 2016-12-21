@@ -67,15 +67,15 @@ exports.start = (options) =>
       msg.debug "Rendering mustache template using #{templateName.yellow}"
       res.writeHead (if page is 'notfound' then 404 else 200), 'Content-Type': 'text/html'
       try
-        html = mustache.render @assets.getPartial(@config.getTemplate()), context, @assets.getPartials()
+        html = mustache.render @assets.getPartial(templateName), context, @assets.getPartials()
       catch err
         html = "Error compiling #{page}.mustache:<pre>#{err}</pre>"
         msg.error html
       res.end html
     else
-      msg.error "Unable to render template; missing " + "#{@config.getTemplate()}.mustache".yellow
+      msg.error "Unable to render template; missing " + "#{templateName}.mustache".yellow
       res.writeHead 500, 'Content-Type': 'text/html'
-      res.end "Unable to render template; missing #{@config.getTemplate()}.mustache"
+      res.end "Unable to render template; missing #{templateName}.mustache"
 
 
   instance = http.createServer (req, res) =>
@@ -85,7 +85,6 @@ exports.start = (options) =>
       assets: @assets.getAssets()
 
     ### Web Server Responses ###
-
     # 1) If this is one of our configured pages, serve it up
     if @config.hasPage context.urlParts.page
       renderPage req, res, context, context.urlParts.page

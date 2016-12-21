@@ -6,6 +6,7 @@ chokidar        = require 'chokidar'
 {EventEmitter}  = require 'events'
 RequirementMissingError = require './requirementMissingError'
 configManager = require './configmanager'
+semver = require 'semver'
 
 # Set up logging
 Messages  = require './messages'
@@ -30,14 +31,14 @@ class AssetManager extends EventEmitter
       else
         msg.debug "Ignored #{event}:#{path}"
 
-   needScan: ->
+  needScan: ->
     if @timer then clearTimeout @timer
     @timer = setTimeout @scan, 200
 
-   scan: (baseDir = process.cwd()) =>
-    msg.debug "Scanning for asset files in #{baseDir.yellow}"
+  scan: ->
     base = path.join process.cwd(), @assetsDir
-    # If there is no assets directory, then we should build one
+    msg.debug "Scanning for asset files in #{base.yellow}"
+    # If there is no assets directory, then exit
     if not fs.existsSync base
       throw new RequirementMissingError "Assets directory not found: #{base}"
 
@@ -58,19 +59,25 @@ class AssetManager extends EventEmitter
             msg.debug "Found file #{assetPath.yellow}"
             # Asset's key is file name without extension
             ext = path.extname fileName
-            key = path.basename fileName, ext
+            fileNameNoExt = path.basename fileName, ext
+            
             rel = assetPath.substr base.length
-            if ext is '.mustache'
-              key = prefix+key
+            if ext is '.mustache' #Drop extension and add path prefix as the key
+              key = prefix + fileNameNoExt
               msg.debug "Adding partial #{key.yellow}"
               @partials[key] = fs.readFileSync(assetPath, encoding:'utf8')
             else
-              msg.debug "Adding static file #{key.yellow}"
+              msg.debug "Adding static file #{key}".yellow
               @staticFiles[rel] =
                 path: "#{@assetsDir}#{rel}" 
                 data: fs.readFileSync assetPath
+              key =
+                if (configManager.creativeConfig.toolSettings?.modelCodeVersion or 0) >= 1
+                  fileName.replace('.', '_')
+                else
+                  path.basename fileName, ext
               dir[key] = "/_#{rel}"
-        else
+        else #ignoreFile assetPath
           msg.debug "Ignoring #{assetPath.gray}"
       dir
     @assets = walk base
