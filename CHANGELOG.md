@@ -1,7 +1,7 @@
 # Change Log
 
 ### 0.4.0
-- Switch assets to be keyed by basename_ext instead of just basename.  Added tool settings config to track these types of changes per creative.  See [Tool Settings][TOOLSETTINGS.md].
+- Switch assets to be keyed by basename_ext instead of just basename.  Added tool settings config to track these types of changes per creative.  See [Tool Settings](TOOLSETTINGS.md).
 
 ### 0.3.1
 - Small doc update in tutorial.

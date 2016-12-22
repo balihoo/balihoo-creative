@@ -1,6 +1,6 @@
 # Tool Settings.
 
-The Balihoo Creative tool is always under development.  Any changes will be documented in the [change log][CHANGELOG.md].  Most of the time those features should just affect the tool itself and the features it provides, but sometimes those changes may affect how creatives are loaded or edited.
+The Balihoo Creative tool is always under development.  Any changes will be documented in the [change log](CHANGELOG.md).  Most of the time those features should just affect the tool itself and the features it provides, but sometimes those changes may affect how creatives are loaded or edited.
 
 ## Backward Compatibility
 
@@ -19,8 +19,8 @@ The `.balihoo-creative.json` file may optionally contain a section for `toolSett
   "name": "example",
   "description": "Example of config file with toolSettings",
   "channel": "Local Websites",
-  ...
   "template": "main",
+  "...": "other stuff here",
   "port": 8088,
   "toolSettings": {
     "modelCodeVersion": 1
