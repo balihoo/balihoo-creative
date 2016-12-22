@@ -35,6 +35,8 @@ The `.balihoo-creative.json` file may optionally contain a section for `toolSett
 Changes to the model code that is saved with the form.  This model code includes fields that are referenced by mustache templates.
 
 ####  modelCodeVersion: 1
+Introduced in balihoo-creative 0.4.0
+
 This changes the `assets` collection to have files referenced as `filename_ext` instead of just `filename` without any extension.  This provides two advantages.  
 
 First, it prevents asset key collisions when two assets start with the same basename, such as foo.jpg and foo.png, but also vendor.js and vendor/thing.js.
