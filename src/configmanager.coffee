@@ -14,6 +14,12 @@ Messages  = require './messages'
 msg = new Messages 'CONFIG'
 creativeConfigPathDefault = './.balihoo-creative.json'
 
+# Constants for tool version specific features
+# NOTE: When adding features, ALWAYS start at 1 or increment the version by 1.
+toolSettings =
+  modelCodeVersion:
+    ASSETS_KEYED_WITH_UNDERSCORE_EXTENSION: 1
+
 class ConfigManager extends EventEmitter
   constructor: (@creativeConfigPath = creativeConfigPathDefault) ->
     msg.debug 'Instantiating configmanager'
@@ -24,6 +30,7 @@ class ConfigManager extends EventEmitter
       @needReload()
     @loadFormbuilderConfig()
     @loadCreativeConfig()
+    ConfigManager.checkToolVersionMeetsCreativeConfigFeatures()
 
   needReload: ->
     if @timer then clearTimeout @timer
@@ -77,6 +84,9 @@ class ConfigManager extends EventEmitter
       pages: ['index', 'assets', 'urls', 'sampledata', 'test', 'config', 'notfound']  #todo: why all these as default?
       template: 'main'
       port: 8088
+      toolSettings:
+        modelCodeVersion: Object.keys(toolSettings.modelCodeVersion).length #assume most recent feature
+        
     fs.writeFileSync creativeConfigPath, JSON.stringify(creativeConfig, null, '  ')
 
   hasPage: (page) -> page in ConfigManager.creativeConfig.pages
@@ -161,6 +171,25 @@ class ConfigManager extends EventEmitter
             return cb err
         cb()
   @creativeConfig = {} #will be read by other processes
+
+  # Check that the creative config has specific features.  Returns boolean.
+  @creativeConfigHasFeature:
+    assetsKeyedWithUnderscoreExtension: ->
+      (ConfigManager.creativeConfig.toolSettings?.modelCodeVersion or 0) >=
+        toolSettings.modelCodeVersion.ASSETS_KEYED_WITH_UNDERSCORE_EXTENSION
+  
+  # Check that all the toolSettings specified in the creative config can be met by this version of the creative tool.
+  @checkToolVersionMeetsCreativeConfigFeatures: ->
+    for settingName, settingValue of ConfigManager.creativeConfig.toolSettings
+      # Make sure we know about all the toolSettings in the creative config. If not, a newer version of the tool added them.
+      unless toolSettings[settingName]?
+        throw new Error "Creative Config toolSetting \"#{settingName}\" is unknown to this version of the balihoo-creative tool."
+      # Make sure that the the version of this setting in the config file is supported by this tool.
+      toolMaxSupported = Object.keys(toolSettings[settingName]).length
+      if toolMaxSupported < settingValue
+        throw new Error "Creative Config toolSetting \"#{settingName}\" value #{settingValue} is newer than this version of the balihoo-creative tool supports (#{toolMaxSupported}).  Please upgrade the tool to a newer version before editing this creative."
+
+      
 
 
 module.exports = ConfigManager

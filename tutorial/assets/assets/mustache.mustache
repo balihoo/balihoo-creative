@@ -25,7 +25,7 @@
   <p>By using the <code>{{# section}}</code> syntax we are able to change the rendered content based on the state of the <a href="#context">context</a>. Mustache also supports inverted <code>{{^sections}}</code> which will render a block if the reference does not exist in the context (or evaluates to <em>false</em>).</p>
 
   <h3 id="variables">{{variables}}</h3>
-  <p>In the above template we get the <em>src</em> for our sidenav script using <code>{{assets.js.sidenav}}</code>. We'll discuss the dot notation a little later on. Here, the value for that key is substituted directly into the template. It is important to note that this tag will automatically HTML-escape any html entities that are embedded in the value. So, for example, if the value was "this &amp; that", then Mustache will output "this &amp;amp; that". You should generally not embed HTML tags into your data, but if you need unescaped output then use the triple-mustache tag <code>{{{unformated}}}.</code></p>
+  <p>In the above template we get the <em>src</em> for our sidenav script using <code>{{assets.js.sidenav_js}}</code>. We'll discuss the dot notation a little later on. Here, the value for that key is substituted directly into the template. It is important to note that this tag will automatically HTML-escape any html entities that are embedded in the value. So, for example, if the value was "this &amp; that", then Mustache will output "this &amp;amp; that". You should generally not embed HTML tags into your data, but if you need unescaped output then use the triple-mustache tag <code>{{{unformated}}}.</code></p>
 
 <%={{ }}=%>
 

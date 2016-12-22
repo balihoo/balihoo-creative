@@ -90,8 +90,10 @@ class Forms
       @emit 'progress', '***Form ID: ' + creativeFormId + '***'
 
   saveExistingDraft: (creativeFormId, urls) ->
+    formVersion = null
     @getFormVersion(creativeFormId)
-    .then (formVersion) =>
+    .then (vers) =>
+      formVersion = vers
       @getUpdatedDate(creativeFormId, formVersion)
     .then (updatedDate) =>
       creativeForm = @generateForm urls, updatedDate
@@ -122,7 +124,7 @@ class Forms
         ifpage:
           index: true
     , @samples.getSample 'default'
-
+    
     name: @config.name
     channel: @config.channel
     brands: @config.brands

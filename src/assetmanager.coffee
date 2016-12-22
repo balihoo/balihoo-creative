@@ -72,7 +72,7 @@ class AssetManager extends EventEmitter
                 path: "#{@assetsDir}#{rel}" 
                 data: fs.readFileSync assetPath
               key =
-                if (configManager.creativeConfig.toolSettings?.modelCodeVersion or 0) >= 1
+                if configManager.creativeConfigHasFeature.assetsKeyedWithUnderscoreExtension()
                   fileName.replace('.', '_')
                 else
                   path.basename fileName, ext
