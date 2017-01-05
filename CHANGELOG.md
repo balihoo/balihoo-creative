@@ -1,5 +1,8 @@
 # Change Log
 
+### 0.4.1
+- Remove reference to package that is no longer used, and also not in package.json.
+
 ### 0.4.0
 - Switch assets to be keyed by basename_ext instead of just basename.  Added tool settings config to track these types of changes per creative.  See [Tool Settings](TOOLSETTINGS.md).
 

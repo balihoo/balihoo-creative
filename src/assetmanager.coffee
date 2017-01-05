@@ -6,7 +6,6 @@ chokidar        = require 'chokidar'
 {EventEmitter}  = require 'events'
 RequirementMissingError = require './requirementMissingError'
 configManager = require './configmanager'
-semver = require 'semver'
 
 # Set up logging
 Messages  = require './messages'
