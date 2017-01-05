@@ -13,10 +13,11 @@
 
   <p>Note that <code>balihoo.png</code> is located under <code>assets/img/</code>. So, when you want to reference our logo file within a mustache template you would do the following:
 {{=<% %>=}}
-  <div class="highlight"><pre><code class="language-mustache" data-lang="mustache">&lt;img src={{assets.img.balihoo}}/&gt;</code></pre></div>
+  <div class="highlight"><pre><code class="language-mustache" data-lang="mustache">&lt;img src={{assets.img.balihoo_png}}/&gt;</code></pre></div>
 <%={{ }}=%>
 
-  <p>Note that we left off the extension <em>.png</em>. When you refer to static assets you strip away the file extension. This can cause problems if you aren't careful. For example, you would have a collision if you put both <code>balihoo.pdf</code> and <code>balihoo.png</code> in the same directory. Every static asset file in a given directory should have a unique basename.</p>
+  <p>Note that the extension <em>.png</em> is referenced with an underscore instead of a dot. It would be possible to create a collision if you had for example a file named balihoo.png and balihoo_png (no extension).  Don't do that.</p>
+  <p>All dots in a file name will be converted to underscores when referenced in a mustache template, so you could serve a file at <code>assets/css/brand.css.map</code> with the tag <code>assets.css.brand_css_map</code></p>
 
 </div>
 

@@ -14,6 +14,12 @@ Messages  = require './messages'
 msg = new Messages 'CONFIG'
 creativeConfigPathDefault = './.balihoo-creative.json'
 
+# Constants for tool version specific features
+# NOTE: When adding features, ALWAYS start at 1 or increment the version by 1.
+toolSettings =
+  modelCodeVersion:
+    ASSETS_KEYED_WITH_UNDERSCORE_EXTENSION: 1
+
 class ConfigManager extends EventEmitter
   constructor: (@creativeConfigPath = creativeConfigPathDefault) ->
     msg.debug 'Instantiating configmanager'
@@ -24,6 +30,7 @@ class ConfigManager extends EventEmitter
       @needReload()
     @loadFormbuilderConfig()
     @loadCreativeConfig()
+    ConfigManager.checkToolVersionMeetsCreativeConfigFeatures()
 
   needReload: ->
     if @timer then clearTimeout @timer
@@ -42,12 +49,12 @@ class ConfigManager extends EventEmitter
       throw new RequirementMissingError "Creative config file not found: #{@creativeConfigPath}"
 
     msg.debug "Loading project config file #{@creativeConfigPath.yellow}"
-    @creativeConfig = JSON.parse fs.readFileSync(@creativeConfigPath, encoding:'utf8')
+    ConfigManager.creativeConfig = JSON.parse fs.readFileSync(@creativeConfigPath, encoding:'utf8')
     @emit 'update'
 
   saveCreativeConfig: ->
     msg.debug "Saving config file #{@creativeConfigPath.yellow}"
-    fs.writeFileSync @creativeConfigPath, JSON.stringify(@creativeConfig, null, '  ')
+    fs.writeFileSync @creativeConfigPath, JSON.stringify(ConfigManager.creativeConfig, null, '  ')
 
   @createNewFromTemplate: (creativeConfigPath = creativeConfigPathDefault) ->
     # By default, use the current working directory as the project name
@@ -77,22 +84,25 @@ class ConfigManager extends EventEmitter
       pages: ['index', 'assets', 'urls', 'sampledata', 'test', 'config', 'notfound']  #todo: why all these as default?
       template: 'main'
       port: 8088
+      toolSettings:
+        modelCodeVersion: Object.keys(toolSettings.modelCodeVersion).length #assume most recent feature
+        
     fs.writeFileSync creativeConfigPath, JSON.stringify(creativeConfig, null, '  ')
 
-  hasPage: (page) -> page in @creativeConfig.pages
+  hasPage: (page) -> page in ConfigManager.creativeConfig.pages
 
-  getPage: (page) -> @creativeConfig.pages[page]
+  getPage: (page) -> ConfigManager.creativeConfig.pages[page]
 
-  getTemplate: -> @creativeConfig.template
+  getTemplate: -> ConfigManager.creativeConfig.template
 
-  getPort: -> @creativeConfig.port
+  getPort: -> ConfigManager.creativeConfig.port
 
   # get the accumulation of creative and form builder configs for this environment only
   getContext: (env) ->
-    context = clone @creativeConfig
+    context = clone ConfigManager.creativeConfig
     delete context.environments
     context.env = {}
-    extend context.env, clone @creativeConfig.environments[env]
+    extend context.env, clone ConfigManager.creativeConfig.environments[env]
     if @formbuilderConfig
       extend context.env, clone @formbuilderConfig.environments[env]
     context
@@ -100,13 +110,13 @@ class ConfigManager extends EventEmitter
   # Get info on all pushable environments. Just info pertinent to displaying.
   getAllEnvironmentsForSelector: ->
     envsObj = {} #use an object to grab a unique list of common environment names
-    for key of @creativeConfig?.environments
+    for key of ConfigManager.creativeConfig?.environments
       if @formbuilderConfig?.environments[key]
         envsObj[key] = true
       else
         console.warn "Config environment #{key} exists in creative config but not form builder config"
     for key of @formbuilderConfig?.environments
-      if @creativeConfig?.environments[key]
+      if ConfigManager.creativeConfig?.environments[key]
         envsObj[key] = true
       else
         console.warn "Config environment #{key} exists in form builder config but not creative config"
@@ -127,8 +137,8 @@ class ConfigManager extends EventEmitter
   # Updates .balihoo-creative.json with the new form ID returned from Form Builder
   #todo: this is broken!!! never updated when convert to multi-environment
   setCreativeFormId: (formid) ->
-    @creativeConfig.creativeFormId = formid
-    fs.writeFileSync @creativeConfigPath, JSON.stringify(@creativeConfig, null, '  ')
+    ConfigManager.creativeConfig.creativeFormId = formid
+    fs.writeFileSync @creativeConfigPath, JSON.stringify(ConfigManager.creativeConfig, null, '  ')
     
   ###
   # STATICS
@@ -160,6 +170,26 @@ class ConfigManager extends EventEmitter
           else
             return cb err
         cb()
+  @creativeConfig = {} #will be read by other processes
+
+  # Check that the creative config has specific features.  Returns boolean.
+  @creativeConfigHasFeature:
+    assetsKeyedWithUnderscoreExtension: ->
+      (ConfigManager.creativeConfig.toolSettings?.modelCodeVersion or 0) >=
+        toolSettings.modelCodeVersion.ASSETS_KEYED_WITH_UNDERSCORE_EXTENSION
+  
+  # Check that all the toolSettings specified in the creative config can be met by this version of the creative tool.
+  @checkToolVersionMeetsCreativeConfigFeatures: ->
+    for settingName, settingValue of ConfigManager.creativeConfig.toolSettings
+      # Make sure we know about all the toolSettings in the creative config. If not, a newer version of the tool added them.
+      unless toolSettings[settingName]?
+        throw new Error "Creative Config toolSetting \"#{settingName}\" is unknown to this version of the balihoo-creative tool."
+      # Make sure that the the version of this setting in the config file is supported by this tool.
+      toolMaxSupported = Object.keys(toolSettings[settingName]).length
+      if toolMaxSupported < settingValue
+        throw new Error "Creative Config toolSetting \"#{settingName}\" value #{settingValue} is newer than this version of the balihoo-creative tool supports (#{toolMaxSupported}).  Please upgrade the tool to a newer version before editing this creative."
+
+      
 
 
 module.exports = ConfigManager
