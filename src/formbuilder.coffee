@@ -150,7 +150,7 @@ class Forms
     preview: null
     testdata: JSON.stringify testData, null, '  '
     updated: updated
-#    client: 'creative_tool'
+    client: 'creative_tool'
 
 # Turn object to coffee - does not properly support arrays
   toCoffeeString: (obj, urls, tabs = '  ') ->
