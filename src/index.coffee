@@ -6,6 +6,7 @@ assetManager = require './assetmanager'
 testManager = require './testmanager'
 sampleManager = require './samplemanager'
 RequirementMissingError = require './requirementMissingError'
+pkg = require '../package'
 
 argv = (require 'minimist')(process.argv.slice 2)
 
@@ -37,6 +38,8 @@ else if argv.new
   sampleManager.createNewFromTemplate()
   configManager.createNewFromTemplate()
   msg.info 'Complete.'
+else if argv.v
+  msg.info pkg.version
 else
   try
     opn server.start()

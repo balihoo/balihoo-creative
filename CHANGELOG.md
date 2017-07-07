@@ -1,5 +1,8 @@
 # Change Log
 
+### 0.5.0
+- Add client parameter to form save calls, which is required now required in form builder.
+
 ### 0.4.1
 - Remove reference to package that is no longer used, and also not in package.json.
 
