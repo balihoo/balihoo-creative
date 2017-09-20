@@ -34,7 +34,9 @@ class ConfigManager extends EventEmitter
 
   needReload: ->
     if @timer then clearTimeout @timer
-    @timer = setTimeout @loadCreativeConfig, 200
+    @timer = setTimeout =>
+      @loadCreativeConfig()
+    , 200
   
   loadFormbuilderConfig: ->
     try
@@ -105,6 +107,7 @@ class ConfigManager extends EventEmitter
     extend context.env, clone ConfigManager.creativeConfig.environments[env]
     if @formbuilderConfig
       extend context.env, clone @formbuilderConfig.environments[env]
+    context.setCreativeFormId = @setCreativeFormId.bind @, env
     context
     
   # Get info on all pushable environments. Just info pertinent to displaying.
@@ -135,9 +138,8 @@ class ConfigManager extends EventEmitter
     envsArray
 
   # Updates .balihoo-creative.json with the new form ID returned from Form Builder
-  #todo: this is broken!!! never updated when convert to multi-environment
-  setCreativeFormId: (formid) ->
-    ConfigManager.creativeConfig.creativeFormId = formid
+  setCreativeFormId: (env, formid) ->
+    ConfigManager.creativeConfig.environments[env].creativeFormId = formid
     fs.writeFileSync @creativeConfigPath, JSON.stringify(ConfigManager.creativeConfig, null, '  ')
     
   ###
@@ -151,16 +153,16 @@ class ConfigManager extends EventEmitter
       environments:
         dev:
           url: "https://fb.dev.balihoo-cloud.com"
-          username: "--Your Stormpath API Key ID--"
-          password: "--Your Stormpath API Key Secret--"
+          username: "--Your OAuth API Key ID--"
+          password: "--Your OAuth API Key Secret--"
         stage:
           url: "https://fb.stage.balihoo-cloud.com"
-          username: "--Your Stormpath API Key ID--"
-          password: "--Your Stormpath API Key Secret--"
+          username: "--Your OAuth API Key ID--"
+          password: "--Your OAuth API Key Secret--"
         prod:
           url: "https://fb.balihoo-cloud.com"
-          username: "--Your Stormpath API Key ID--"
-          password: "--Your Stormpath API Key Secret--"
+          username: "--Your OAuth API Key ID--"
+          password: "--Your OAuth API Key Secret--"
     mkdirp path.dirname(ConfigManager.formbuilderConfigPath), (err) ->
       if err then return cb err
       fs.writeFile ConfigManager.formbuilderConfigPath, JSON.stringify(configFileContents, null, 2), flag:'wx', (err) ->
