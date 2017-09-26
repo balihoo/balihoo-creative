@@ -12,12 +12,12 @@ msg = new Messages 'FORMBUILDER'
 # Save forms to form builder
 class Forms
   constructor: (@emit, @assets, @samples) ->
-  config: (@config) ->
+  config: (@envconfig) ->
     @envRequest = Promise.promisify request.defaults
-      baseUrl: @config.env.url
+      baseUrl: @envconfig.env.url
       auth:
-        username: @config.env.username
-        password: @config.env.password
+        username: @envconfig.env.username
+        password: @envconfig.env.password
         
   checkForFormBuilderError: (errorMsgLead) ->
     (incomingMessage) ->
@@ -72,7 +72,7 @@ class Forms
       creativeFormId = incomingMessage.body.formid
       @emit 'progress', 'Saved new creative form and draft.'
       @emit 'progress', '***Form ID: ' + creativeFormId + '***'
-      @config.setCreativeFormId creativeFormId #todo: make this work, and env specific
+      @envconfig.setCreativeFormId creativeFormId
 
   saveNewDraft: (creativeFormId, urls) ->
     @getFormVersion(creativeFormId)
@@ -108,9 +108,9 @@ class Forms
 
   # Generate new form parameters
   generateForm: (urls, updated = '') ->
-    if @config.env.companionFormId isnt 0
+    if @envconfig.env.companionFormId isnt 0
       imports = [
-        importformid: @config.env.companionFormId
+        importformid: @envconfig.env.companionFormId
         namespace: 'companion'
       ]
     else
@@ -125,14 +125,14 @@ class Forms
           index: true
     , @samples.getSample 'default'
     
-    name: @config.name
-    channel: @config.channel
-    brands: @config.brands
+    name: @envconfig.name
+    channel: @envconfig.channel
+    brands: @envconfig.brands
     type: 'Creative'
-    description: @config.description
-    endpoint: @config.env.endpoint
+    description: @envconfig.description
+    endpoint: @envconfig.env.endpoint
     imports: imports
-    layout: @assets.getPartial @config.template
+    layout: @assets.getPartial @envconfig.template
     listsource: null
     model: """imports.companion.inject root
 
@@ -146,7 +146,7 @@ class Forms
 
     field 'assets', visible: no, value: #{@toCoffeeString @assets.getAssets(), urls}
     """
-    partials: _.omit @assets.getPartials(), @config.template
+    partials: _.omit @assets.getPartials(), @envconfig.template
     preview: null
     testdata: JSON.stringify testData, null, '  '
     updated: updated
@@ -170,8 +170,8 @@ class Forms
     @emit 'progress', 'Done uploading static assets.'
     @emit 'progress', 'Saving creative form...'
 
-    creativeFormId = @config.env.creativeFormId
-    companionFormId = @config.env.companionFormId
+    creativeFormId = @envconfig.env.creativeFormId
+    companionFormId = @envconfig.env.companionFormId
 
     if companionFormId is 0
       @emit 'progress', "***"

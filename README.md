@@ -7,7 +7,7 @@ with Balihoo's online resources like Form-Builder & BLIP to make template design
 maintenance a seemless, painless experience.
 
 ## Version
-0.4.0
+0.5.1
 
 ## Installation
   Make sure you have a recent version of node and npm installed and

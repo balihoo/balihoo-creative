@@ -1,5 +1,8 @@
 # Change Log
 
+### 0.5.1
+- Fix new form creating when writing resulting formid to the creative config file.
+
 ### 0.5.0
 - Add client parameter to form save calls, which is required now required in form builder.
 
