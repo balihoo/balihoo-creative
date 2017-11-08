@@ -1,5 +1,8 @@
 # Change Log
 
+### 0.5.2
+- Documentation changes, including in the tutorial.
+
 ### 0.5.1
 - Fix new form creating when writing resulting formid to the creative config file.
 
