@@ -115,6 +115,7 @@ class TestManager extends EventEmitter
             display: none;
           }
         </style>
+        <script>window.jQuery || document.write('<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"><\/script>')</script>
         <script src="//code.jquery.com/qunit/qunit-1.16.0.js"></script>
         <link rel="stylesheet" href="//code.jquery.com/qunit/qunit-1.16.0.css">
         <link rel="stylesheet" href="//code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css">
